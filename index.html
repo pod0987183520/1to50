@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>1到50 數字挑戰</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="icon" href="z_img_app_192.png" type="image/png">
+    <link rel="apple-touch-icon" href="z_img_app_192.png">
+    <meta property="og:image" content="https://你的GitHub帳號.github.io/你的專案名稱/z_img_line.png">
+</head>
+<body>
+    <div class="info-bar" style="width: 100%; max-width: 600px;">
+        <div id="hintDisplay" class="target-hint">請點選：1</div>
+        <div class="right-controls">
+            <div id="timerDisplay" class="timer">⏱️ 0.00 秒</div>
+            <button id="historyBtn" class="btn-history">📊</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div id="gameGrid" class="grid"></div>
+    </div>
+
+    <div class="counter-display">
+        累積遊玩：<span id="totalPlays">0</span> 次<br>
+        玩家總數：<span id="totalVisitors">0</span> 人
+    </div>
+
+    <button id="pwaFixedBtn" class="pwa-btn hidden">📲 加入主畫面</button>
+
+    <div id="androidBanner" class="install-banner hidden">
+        <div class="banner-title">將遊戲加入桌面，隨時隨地玩！</div>
+        <div class="banner-actions">
+            <button id="androidInstallBtn" class="btn-install">立即安裝</button>
+            <button id="androidCloseBtn" class="btn-cancel">稍後再說</button>
+        </div>
+    </div>
+
+    <div id="iosModalB" class="modal-overlay hidden" style="z-index: 10000; align-items: flex-end; padding-bottom: 30px;">
+        <div class="modal-content" style="background: #f0f4f8; border: 2px solid #0f4c81;">
+            <h3 style="color: #0f4c81; margin-bottom: 15px;">🍏 iPhone 加入桌面教學</h3>
+            <div style="text-align: left; line-height: 1.8; font-size: 18px; color: #333;">
+                1. 點擊瀏覽器下方的 <strong style="color:#0f4c81;">「分享」</strong> 圖示<br>
+                2. 往下滑動，點選 <strong style="color:#0f4c81;">「加入主畫面」</strong><br>
+                3. 點擊右上角的 <strong style="color:#0f4c81;">「新增」</strong>
+            </div>
+            <img src="z_img_app_512.png" alt="iOS 加入主畫面教學" style="width: 100%; margin-top: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <button id="iosCloseBtn" class="btn-close" style="margin-top: 20px;">我知道了</button>
+        </div>
+    </div>
+
+    <div id="lineGuideModal" class="guide-modal hidden">
+        <div class="line-title">⚠️ 請在瀏覽器中開啟</div>
+        <div class="line-steps">
+            為了確保遊戲順暢與記錄保存：<br><br>
+            1. 請點擊右上角的 <strong style="color:#e53e3e;">[⋮]</strong> 或 <strong style="color:#e53e3e;">[≡]</strong><br>
+            2. 選擇 <strong style="color:#e53e3e;">「以其他應用程式開啟」</strong> 或 <strong style="color:#e53e3e;">「在預設瀏覽器中開啟」</strong>
+        </div>
+        <img src="z_img_line.png" alt="LINE 開啟瀏覽器教學" style="width: 80%; margin: 20px auto; border-radius: 10px;">
+        <button id="lineCloseBtn" class="btn-guide-close">關閉提示</button>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">🎉 挑戰完成！</div>
+            <div id="finalScore" class="modal-score">本次成績：0.00 秒</div>
+            <div id="rankMessage" class="modal-rank"></div>
+            <div id="praiseMessage" class="modal-praise"></div>
+            <button id="restartBtn" class="btn-restart">再玩一次</button>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">📊 歷史戰績</div>
+            <div class="history-subtitle">保留近 90 天的最佳紀錄</div>
+            <div id="historyList" class="history-list"></div>
+            <button id="closeHistoryBtn" class="btn-close">關閉</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('ServiceWorker 註冊成功！'))
+                    .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
+            });
+        }
+    </script>
+</body>
+</html>

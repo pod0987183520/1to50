@@ -1,0 +1,23 @@
+{
+  "name": "遊戲1~50",
+  "short_name": "遊戲1~50",
+  "description": "預防失智，訓練手眼協調的數字遊戲",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#0f4c81",
+  "orientation": "portrait",
+	"icons": [
+	    {
+	      "src": "z_img_app_192.png",
+	      "sizes": "192x192",
+	      "type": "image/png"
+	    },
+	    {
+	      "src": "z_img_app_512.png",
+	      "sizes": "512x512",
+	      "type": "image/png",
+	      "purpose": "any maskable"
+	    }
+	  ]
+}

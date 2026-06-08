@@ -1,0 +1,136 @@
+:root {
+    --bg-color: #f0f4f8;
+    --primary-color: #0f4c81; 
+    --primary-hover: #1664a5;
+    --text-color: #ffffff;
+    --empty-color: #e2e8f0; 
+    --wrong-color: #e53e3e; 
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-color);
+    min-height: 100dvh; 
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; 
+    padding: 2vh 4vw; 
+    user-select: none; -webkit-user-select: none;
+    overflow: hidden; touch-action: manipulation;
+}
+
+.game-container {
+    width: 100%; max-width: 600px; 
+    display: flex; flex-direction: column;
+    gap: 15px; margin: 0 auto;
+}
+
+/* 頂部資訊列 */
+.info-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px; font-size: clamp(20px, 5vw, 28px); 
+    font-weight: bold; color: #2d3748;
+}
+.right-controls { display: flex; align-items: center; gap: 10px; }
+.timer { color: #2c5282; font-variant-numeric: tabular-nums; }
+.target-hint { background-color: #feebc8; color: #c05621; padding: 4px 12px; border-radius: 8px; border: 2px solid #dd6b20; }
+.btn-history {
+    background-color: #4a5568; color: white; border: none;
+    width: 40px; height: 40px; border-radius: 50%;
+    font-size: 20px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s;
+}
+.btn-history:active { transform: scale(0.9); }
+
+/* 遊戲網格 - 已導入高防禦性觸控隔離 */
+.grid {
+    display: grid; gap: 2vmin; width: 100%;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    max-width: min(100%, 65dvh); margin: 0 auto; aspect-ratio: 1 / 1; 
+    touch-action: none; /* 強制關閉瀏覽器對此區域的縮放、滑動手勢判定 */
+}
+.grid-cell {
+    background-color: var(--primary-color); color: var(--text-color);
+    font-size: clamp(22px, 6vmin, 42px); font-weight: 900; 
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: transform(0.05s), background-color 0.1s;
+    touch-action: none; /* 確保單一元件不受多指握持手勢干擾 */
+}
+.grid-cell:active { transform: translateY(4px); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.grid-cell.wrong { background-color: var(--wrong-color) !important; }
+
+/* 彈窗系統 */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); display: flex;
+    align-items: center; justify-content: center; padding: 15px;
+    z-index: 1000; opacity: 0; visibility: hidden; 
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.show { opacity: 1; visibility: visible; }
+
+.modal-content {
+    background-color: white; width: 100%; max-width: 450px; max-height: 90dvh; 
+    overflow-y: auto; border-radius: 20px; padding: 25px 20px; text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9); transition: transform 0.3s ease;
+}
+.modal-overlay.show .modal-content { transform: scale(1); }
+
+.modal-title { font-size: 28px; color: #2b6cb0; margin-bottom: 10px; font-weight: bold; }
+.modal-praise { font-size: 20px; color: #2d3748; margin-bottom: 15px; line-height: 1.4; padding: 8px; background-color: #f7fafc; border-radius: 10px; }
+.modal-score { font-size: 26px; font-weight: bold; color: #e53e3e; margin-bottom: 10px; }
+.modal-rank { font-size: 20px; font-weight: bold; color: #2b6cb0; margin: 15px 0; background: #ebf8ff; padding: 10px; border-radius: 10px; border: 1px solid #bee3f8; }
+
+.history-subtitle { color: #718096; font-size: 16px; margin-bottom: 5px; }
+.history-list { text-align: left; max-height: 250px; overflow-y: auto; margin: 15px 0; padding: 5px; border: 1px solid #e2e8f0; border-radius: 10px; }
+
+.btn-restart, .btn-close {
+    background-color: #48bb78; color: white; font-size: 24px; font-weight: bold;
+    padding: 12px 20px; border: none; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 4px 0px #2f855a; transition: all 0.1s; width: 100%;
+}
+.btn-restart:active, .btn-close:active { transform: translateY(4px); box-shadow: 0 1px 0px #2f855a; }
+.btn-close { background-color: #a0aec0; box-shadow: 0 4px 0px #718096; margin-top: 10px; font-size: 20px; padding: 10px; }
+
+/* 浮動計數器與安裝提示 */
+.counter-display { position: fixed; bottom: 10px; right: 12px; font-size: 15px; font-weight: bold; color: #333; text-align: right; pointer-events: none; line-height: 1.6; z-index: 90; text-shadow: 1px 1px 2px white, -1px -1px 2px white; }
+#totalPlays { color: #0f4c81; font-size: 16px; }
+#totalVisitors { color: #2f855a; font-size: 16px; }
+
+.hidden { display: none !important; }
+
+.pwa-btn { position: fixed; bottom: 20px; left: 20px; z-index: 999; background: #0f4c81; color: white; border: none; padding: 10px 16px; border-radius: 50px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.install-banner { position: fixed; top: 10px; left: 10px; right: 10px; background: #fffff0; border: 4px solid #48bb78; padding: 10px 12px; z-index: 9999; text-align: center; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+.banner-title { font-size: 20px; font-weight: bold; color: #2f855a; margin-bottom: 8px; }
+.banner-actions { display: flex; gap: 8px; }
+.btn-install { flex: 2; background: #48bb78; color: white; font-size: 18px; font-weight: bold; padding: 10px; border: none; border-radius: 50px; box-shadow: 0 4px 0 #2f855a; }
+.btn-cancel { flex: 1; background: #a0aec0; color: white; font-size: 16px; padding: 10px; border: none; border-radius: 50px; box-shadow: 0 4px 0 #718096; }
+
+.guide-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; color: white; display: flex; flex-direction: column; padding: 40px 20px; }
+.line-bg { background: #111; padding: 20px; }
+.guide-content { text-align: center; margin-top: 15vh; max-width: 350px; margin-inline: auto; }
+.guide-steps { font-size: 22px; text-align: left; line-height: 2; margin-bottom: 40px; }
+.step-btn { background: #4a5568; padding: 4px 10px; border-radius: 8px; }
+.step-highlight { color: #f6ad55; }
+.btn-guide-close { background: #e53e3e; color: white; border: none; padding: 12px 40px; border-radius: 50px; font-size: 20px; font-weight: bold; margin-top: 20px; }
+.bg-gray { background: #666; }
+.line-arrow { text-align: right; font-size: 35px; color: #e53e3e; }
+.line-title { color: #58b04c; font-size: 32px; margin-bottom: 30px; }
+.line-steps { font-size: 22px; line-height: 1.8; text-align: left; background: #222; padding: 20px; border-radius: 15px; border: 2px dashed #58b04c; }
+
+@media (max-width: 768px) {
+    .grid { gap: 6px; }
+    .modal-content { padding: 20px 15px; }
+    .modal-title { font-size: 24px; }
+    .modal-score { font-size: 22px; }
+}
