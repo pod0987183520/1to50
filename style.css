@@ -48,25 +48,42 @@ body {
 }
 .btn-history:active { transform: scale(0.9); }
 
-/* 遊戲網格 - 已導入高防禦性觸控隔離 */
+/* 遊戲網格 - 老人模式最大化數字 */
 .grid {
-    display: grid; gap: 2vmin; width: 100%;
+    display: grid;
+    gap: 4px;                          /* 固定小間距，釋出更多空間給數字 */
+    width: 100%;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    max-width: min(100%, 65dvh); margin: 0 auto; aspect-ratio: 1 / 1; 
-    touch-action: none; /* 強制關閉瀏覽器對此區域的縮放、滑動手勢判定 */
+    max-width: min(100%, 75dvh);       /* 加大網格 */
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+    touch-action: none;
 }
 .grid-cell {
-    background-color: var(--primary-color); color: var(--text-color);
-    font-size: clamp(22px, 6vmin, 42px); font-weight: 900; 
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 12px; cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: clamp(32px, 13vmin, 60px); /* 大幅升級字體大小 */
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;                /* 稍小圓角，活用更多格子面積 */
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
     transition: transform 0.05s, background-color 0.1s;
-    touch-action: none; /* 確保單一元件不受多指握持手勢干擾 */
+    touch-action: none;
+    padding: 2px;                      /* 數字不貼邊界 */
+    line-height: 1;                    /* 去掉多餘行高，數字可更居中 */
+    overflow: hidden;
 }
-.grid-cell:active { transform: translateY(4px); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.grid-cell:active { transform: translateY(3px); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 .grid-cell.wrong { background-color: var(--wrong-color) !important; }
+
+/* 三位數字自動縮小字體 */
+.grid-cell.three-digit {
+    font-size: clamp(22px, 9vmin, 42px);
+}
 
 /* 彈窗系統 */
 .modal-overlay {

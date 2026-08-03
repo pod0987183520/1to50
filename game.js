@@ -131,6 +131,16 @@ function getPraiseMessage(rawSeconds) {
     return "🌟 不錯喔！再玩一次，<br>讓我們一定可以突破400秒！";
 }
 
+// 輔助：設定格子數字與三位數字自動縮小
+function setCellNumber(cell, num) {
+    cell.innerText = num;
+    if (num >= 100) {
+        cell.classList.add('three-digit');
+    } else {
+        cell.classList.remove('three-digit');
+    }
+}
+
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -179,7 +189,7 @@ function initGame() {
         const cell = document.createElement('div');
         cell.className = 'grid-cell';
         cell.setAttribute('data-val', num);
-        cell.innerText = num;
+        setCellNumber(cell, num);
         
         // 👍 用 pointerdown 確保長輩左手指腹壓在螢幕邊緣時，右手依然能「一摸即中」防誤觸
         cell.addEventListener('pointerdown', () => {
@@ -229,7 +239,7 @@ function handleCellClick(cell) {
     if (currentVal <= step * 25) {
         const nextVal = currentVal + step * 25;
         cell.setAttribute('data-val', nextVal);
-        cell.innerText = nextVal;
+        setCellNumber(cell, nextVal);
     } else {
         // 第二輪點完 → 格子隱藏
         cell.innerText = '';
