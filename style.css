@@ -219,26 +219,29 @@ body {
 .line-steps { font-size: 22px; line-height: 1.8; text-align: left; background: #0a130c; padding: 20px; border-radius: 15px; border: 2px dashed #2e7d32; }
 
 /* ==========================================
-   難度按鈕（加大老人適用）
+   難度按鈕（大幅加大：與遊戲格子同等級別尺寸）
    ========================================== */
 .btn-difficulty {
     pointer-events: all;
     background: linear-gradient(135deg, #2e7d4f 0%, #1b5e35 100%);
     color: #ffffff;
-    border: 2px solid #66bb6a;
-    padding: 8px 16px;
+    border: 3px solid #66bb6a;
+    padding: 12px 22px;
     border-radius: 50px;
-    font-size: 18px;
+    font-size: clamp(20px, 4.5vw, 24px);
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(76,175,80,0.3);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.6), 0 0 12px rgba(76,175,80,0.4);
     transition: transform 0.15s, box-shadow 0.15s;
     white-space: nowrap;
-    line-height: 1.4;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .btn-difficulty:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    transform: translateY(3px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
 /* ==========================================
@@ -291,5 +294,4 @@ body {
     .modal-content { padding: 20px 15px; }
     .modal-title { font-size: 24px; }
     .modal-score { font-size: 22px; }
-    .btn-difficulty { font-size: 13px; }
 }
