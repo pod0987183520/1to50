@@ -1,11 +1,10 @@
-// 🌟 升級版本號至 v3，讓手機得知設定已變更
-const CACHE_NAME = '1to50-pwa-cache-v4.08';
+const CACHE_NAME = '1to50-pwa-cache-v4.09';
 
-// 🌟 變更：將快取清單更新為你全新的圖片名稱
+// 🌟 變更：將快取清單更新為最新網址
 const ASSETS_TO_CACHE = [
   'index.html',
-  'style.css',
-  'game.js',
+  'style.css?v=4.09',
+  'game.js?v=4.09',
   'manifest.json',
   'z_img_app_192.png',
   'z_img_app_512.png',
