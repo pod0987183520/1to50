@@ -174,23 +174,24 @@ body {
 .btn-restart:active, .btn-close:active { transform: translateY(4px); box-shadow: 0 1px 0px #1b5e20; }
 .btn-close { background-color: #37474f; box-shadow: 0 4px 0px #263238; margin-top: 10px; font-size: 20px; padding: 10px; }
 
-/* 底部右下角區塊：難度按鈕 + 計數器 並排 */
+/* 底部右下角區塊：難度按鈕（在上） + 計數器（在下） 垂直疊排 */
 .bottom-right-bar {
     position: fixed;
-    bottom: 10px;
-    right: 12px;
+    bottom: 12px;
+    right: 14px;
     display: flex;
+    flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
+    gap: 8px;
     z-index: 91;
     pointer-events: none;
 }
 .counter-display {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
     color: #a5d6a7;
     text-align: right;
-    line-height: 1.6;
+    line-height: 1.5;
     text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     pointer-events: none;
 }

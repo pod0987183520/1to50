@@ -1,10 +1,10 @@
-const CACHE_NAME = '1to50-pwa-cache-v4.10';
+const CACHE_NAME = '1to50-pwa-cache-v4.11';
 
 // 🌟 變更：將快取清單更新為最新網址
 const ASSETS_TO_CACHE = [
   'index.html',
-  'style.css?v=4.10',
-  'game.js?v=4.10',
+  'style.css?v=4.11',
+  'game.js?v=4.11',
   'manifest.json',
   'z_img_app_192.png',
   'z_img_app_512.png',
