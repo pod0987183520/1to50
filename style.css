@@ -62,7 +62,7 @@ body {
     display: flex; align-items: center; justify-content: center;
     border-radius: 12px; cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    transition: transform(0.05s), background-color 0.1s;
+    transition: transform 0.05s, background-color 0.1s;
     touch-action: none; /* 確保單一元件不受多指握持手勢干擾 */
 }
 .grid-cell:active { transform: translateY(4px); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
@@ -102,8 +102,26 @@ body {
 .btn-restart:active, .btn-close:active { transform: translateY(4px); box-shadow: 0 1px 0px #2f855a; }
 .btn-close { background-color: #a0aec0; box-shadow: 0 4px 0px #718096; margin-top: 10px; font-size: 20px; padding: 10px; }
 
-/* 浮動計數器與安裝提示 */
-.counter-display { position: fixed; bottom: 10px; right: 12px; font-size: 15px; font-weight: bold; color: #333; text-align: right; pointer-events: none; line-height: 1.6; z-index: 90; text-shadow: 1px 1px 2px white, -1px -1px 2px white; }
+/* 底部右下角區塊：難度按鈕 + 計數器 並排 */
+.bottom-right-bar {
+    position: fixed;
+    bottom: 10px;
+    right: 12px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    z-index: 91;
+    pointer-events: none; /* 附子元素各自設定 */
+}
+.counter-display {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px white, -1px -1px 2px white;
+    pointer-events: none;
+}
 #totalPlays { color: #0f4c81; font-size: 16px; }
 #totalVisitors { color: #2f855a; font-size: 16px; }
 
@@ -128,9 +146,79 @@ body {
 .line-title { color: #58b04c; font-size: 32px; margin-bottom: 30px; }
 .line-steps { font-size: 22px; line-height: 1.8; text-align: left; background: #222; padding: 20px; border-radius: 15px; border: 2px dashed #58b04c; }
 
+/* ==========================================
+   難度按鈕（和計數器並排於小長條內）
+   ========================================== */
+.btn-difficulty {
+    pointer-events: all; /* 覆寫 parent 的 none */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 5px 11px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(102,126,234,0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+    line-height: 1.8;
+}
+.btn-difficulty:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 4px rgba(102,126,234,0.4);
+}
+
+/* ==========================================
+   難度選擇彈窗
+   ========================================== */
+.difficulty-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px 0;
+}
+.difficulty-option {
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: #f7fafc;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s ease;
+}
+.difficulty-option:hover {
+    border-color: #667eea;
+    background: #ebf4ff;
+    transform: translateX(4px);
+}
+.difficulty-option.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #ebf4ff 0%, #f0e6ff 100%);
+    box-shadow: 0 2px 8px rgba(102,126,234,0.25);
+}
+.diff-label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+.difficulty-option.active .diff-label {
+    color: #553c9a;
+}
+.diff-desc {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.5;
+}
+.difficulty-option.active .diff-desc {
+    color: #6b46c1;
+}
+
 @media (max-width: 768px) {
     .grid { gap: 6px; }
     .modal-content { padding: 20px 15px; }
     .modal-title { font-size: 24px; }
     .modal-score { font-size: 22px; }
+    .btn-difficulty { right: 120px; font-size: 13px; }
 }

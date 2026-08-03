@@ -1,11 +1,24 @@
 // ==========================================
 // 1. 遊戲核心變數與 DOM 宣告
 // ==========================================
-let currentTarget = 1;                  
-let startTime = null;                    
-let timerInterval = null;              
-let gameActive = false;                
-const totalNumbers = 50;               
+let currentTarget = 1;
+let startTime = null;
+let timerInterval = null;
+let gameActive = false;
+const TOTAL_CLICKS = 50;   // 所有難度固定點擊 50 次
+
+// ==========================================
+// 難度設定
+// ==========================================
+// step: 每格數字的間距
+// key:  localStorage 儲存鍵，各難度分開記錄
+const MODES = {
+    1: { step: 1, label: '標準 1~50',  key: 'game_1to50_history_x1' },
+    2: { step: 2, label: '×2 倍數',   key: 'game_1to50_history_x2' },
+    5: { step: 5, label: '×5 倍數',   key: 'game_1to50_history_x5' },
+    7: { step: 7, label: '×7 倍數',   key: 'game_1to50_history_x7' }
+};
+let currentMode = 1;   // 預設標準難度
 
 // Google Apps Script 後端 API 網址
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzFXNURbzrMozLkwZ5HlJDiTN9arH5Ihel2gGT2E4I7pjEzQ-RFmU3Cn8eE50LsCyXugQ/exec';
@@ -19,7 +32,10 @@ const DOM = {
     praiseMsg: document.getElementById('praiseMessage'),
     rankMsg: document.getElementById('rankMessage'),
     historyModal: document.getElementById('historyModal'),
-    historyList: document.getElementById('historyList')
+    historyList: document.getElementById('historyList'),
+    historyModeLabel: document.getElementById('historyModeLabel'),
+    difficultyModal: document.getElementById('difficultyModal'),
+    difficultyBtn: document.getElementById('difficultyBtn')
 };
 
 // ==========================================
@@ -32,13 +48,18 @@ function convertToChinese(num) {
     return (num >= 0 && num <= 10) ? chinese[num] : num.toString();
 }
 
+// 取得當前難度的 localStorage key
+function getHistoryKey() {
+    return MODES[currentMode].key;
+}
+
 // 👑 雙軌排行演算法 (強固防禦版：絕不因舊資料崩潰)
 function calculateRankInHistory(currentScore, timestamp) {
     const currentSeconds = parseFloat(currentScore);
     let history = [];
     
     try {
-        const stored = localStorage.getItem('game_1to50_history');
+        const stored = localStorage.getItem(getHistoryKey());
         history = JSON.parse(stored);
         if (!Array.isArray(history)) history = [];
     } catch (e) {
@@ -78,7 +99,7 @@ function calculateRankInHistory(currentScore, timestamp) {
 
     if (isNewRecord) {
         const oldBest = allRecords.length > 1 ? allRecords[1].score : null;
-        historyHtml += `📈 <strong>恭喜你刷新歷史紀錄 <第一名></strong><br>`;
+        historyHtml += `📈 <strong>恭喜你刷新歷史紀錄 &lt;第一名&gt;</strong><br>`;
         historyHtml += oldBest ? `(之前最佳成績僅為 ${oldBest} 秒)` : `(這是你的首戰紀錄喔！)`;
     } else if (historyRank <= 5) {
         const historyBest = parseFloat(allRecords[0].score);
@@ -95,7 +116,7 @@ function calculateRankInHistory(currentScore, timestamp) {
 function getPraiseMessage(rawSeconds) {
     const seconds = Math.round(parseFloat(rawSeconds));
     
-    if (seconds < 60) return "👑 好快！教教我！<br>你是怎麼練的呢?";
+    if (seconds < 60)  return "👑 好快！教教我！<br>你是怎麼練的呢?";
     if (seconds < 100) return "🌟 哇！太厲害了！<br>你的手眼協調真好！";
     if (seconds < 140) return "🌟 喔！不錯喔！<br>你的腦筋很靈活喔！";
     if (seconds < 200) return "🌟 哇！真快！<br>繼續練習！失智症將會遠離你！";
@@ -120,7 +141,7 @@ function shuffleArray(array) {
 function saveScoreToLocal(score, timestamp) {
     let history = [];
     try {
-        const stored = localStorage.getItem('game_1to50_history');
+        const stored = localStorage.getItem(getHistoryKey());
         history = JSON.parse(stored);
         if (!Array.isArray(history)) history = [];
     } catch (e) {
@@ -133,22 +154,25 @@ function saveScoreToLocal(score, timestamp) {
     history.unshift({ date: dateString, score: score, timestamp: timestamp });
     const ninetyDaysAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);
     history = history.filter(item => item && item.timestamp && item.timestamp > ninetyDaysAgo);
-    localStorage.setItem('game_1to50_history', JSON.stringify(history));
+    localStorage.setItem(getHistoryKey(), JSON.stringify(history));
 }
 
 // ==========================================
 // 3. 遊戲核心運行邏輯
 // ==========================================
 function initGame() {
-    currentTarget = 1;
+    const step = MODES[currentMode].step;
+    // currentTarget 從第一個數字開始（例如 step=2 → 從 2 開始）
+    currentTarget = step * 1;
     gameActive = false;
     startTime = null;
     clearInterval(timerInterval);
     DOM.timer.innerText = "⏱️ 0.00 秒";
-    DOM.hint.innerText = "請點選：1";
-    DOM.grid.innerHTML = ''; 
+    DOM.hint.innerText = `請點選：${currentTarget}`;
+    DOM.grid.innerHTML = '';
 
-    const firstHalf = Array.from({ length: 25 }, (_, i) => i + 1);
+    // 第一輪：step*1 ~ step*25（共 25 格）
+    const firstHalf = Array.from({ length: 25 }, (_, i) => step * (i + 1));
     shuffleArray(firstHalf);
 
     firstHalf.forEach(num => {
@@ -164,6 +188,9 @@ function initGame() {
         
         DOM.grid.appendChild(cell);
     });
+
+    // 更新難度彈窗選中狀態
+    updateDifficultyModal();
 }
 
 function handleCellClick(cell) {
@@ -178,38 +205,40 @@ function handleCellClick(cell) {
     // ==========================================
     // 👑 兩全其美震動防禦演算法
     // ==========================================
+    const step = MODES[currentMode].step;
     if (navigator.vibrate) {
-        if (currentTarget === 1) {
-            // 第一下點擊：延遲 150ms 避開全螢幕/網址列收合的硬體忙碌期，確保 100% 震動
+        if (currentTarget === step) {
+            // 第一下點擊：延遲 150ms 避開全螢幕/網址列收合的硬體忙碌期
             setTimeout(() => {
                 if (navigator.vibrate) navigator.vibrate(20);
             }, 150);
         } else {
-            // 後續點擊：硬體與全螢幕已穩定，直接過電震動
             navigator.vibrate(20);
         }
     }
     // ==========================================
     
-    if (currentTarget === 1 && !gameActive) {
+    if (currentTarget === step && !gameActive) {
         gameActive = true;
         startTime = performance.now();
         timerInterval = setInterval(updateTimer, 10);
         document.getElementById('androidBanner').classList.add('hidden');
     }
     
-    if (currentVal <= 25) {
-        const nextVal = currentVal + 25;
+    // 第一輪（step*1 ~ step*25）→ 替換成第二輪（step*26 ~ step*50）
+    if (currentVal <= step * 25) {
+        const nextVal = currentVal + step * 25;
         cell.setAttribute('data-val', nextVal);
         cell.innerText = nextVal;
     } else {
+        // 第二輪點完 → 格子隱藏
         cell.innerText = '';
         cell.style.visibility = 'hidden';
     }
     
-    currentTarget++;
+    currentTarget += step;
     
-    if (currentTarget > totalNumbers) {
+    if (currentTarget > step * TOTAL_CLICKS) {
         endGame();
     } else {
         DOM.hint.innerText = `請點選：${currentTarget}`;
@@ -239,22 +268,73 @@ function endGame() {
 }
 
 // ==========================================
-// 4. 事件綁定與跨載具判斷
+// 4. 難度選擇彈窗邏輯
+// ==========================================
+function updateDifficultyModal() {
+    // 更新選中狀態
+    Object.keys(MODES).forEach(step => {
+        const el = document.getElementById(`diff-x${step}`);
+        if (el) {
+            if (parseInt(step) === currentMode) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        }
+    });
+}
+
+function openDifficultyModal() {
+    updateDifficultyModal();
+    DOM.difficultyModal.classList.add('show');
+}
+
+function closeDifficultyModal() {
+    DOM.difficultyModal.classList.remove('show');
+}
+
+// ==========================================
+// 5. 事件綁定與跨載具判斷
 // ==========================================
 document.getElementById('restartBtn').onclick = () => {
     DOM.resultModal.classList.remove('show');
     initGame();
 };
 
+// 難度按鈕
+DOM.difficultyBtn.onclick = () => openDifficultyModal();
+document.getElementById('closeDifficultyBtn').onclick = () => closeDifficultyModal();
+
+// 點擊難度選項：直接切換並開始新遊戲，不需確認
+Object.keys(MODES).forEach(step => {
+    const el = document.getElementById(`diff-x${step}`);
+    if (el) {
+        el.addEventListener('pointerdown', (e) => {
+            e.stopPropagation(); // 防止事件冒泡到背景關閉邏輯
+            currentMode = parseInt(step);
+            closeDifficultyModal();
+            initGame();
+        });
+    }
+});
+
+// 點擊彈窗背景關閉
+DOM.difficultyModal.addEventListener('pointerdown', (e) => {
+    if (e.target === DOM.difficultyModal) closeDifficultyModal();
+});
+
 document.getElementById('historyBtn').onclick = () => {
     let history = [];
     try {
-        const stored = localStorage.getItem('game_1to50_history');
+        const stored = localStorage.getItem(getHistoryKey());
         history = JSON.parse(stored);
         if (!Array.isArray(history)) history = [];
     } catch (e) {
         history = [];
     }
+
+    // 顯示當前難度名稱
+    DOM.historyModeLabel.textContent = `【${MODES[currentMode].label}】保留近 90 天的最佳紀錄`;
 
     DOM.historyList.innerHTML = history.length === 0 
         ? '<p style="color: #4a5568; text-align:center; padding: 20px;">目前尚無紀錄，趕快去玩一局吧！</p>'
@@ -333,13 +413,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // 🌟 串接全新的 Google Apps Script 雲端計數器
     if (!localStorage.getItem('game_visited_flag')) {
         localStorage.setItem('game_visited_flag', 'true');
-        // 新玩家：增加遊玩次數與訪客數
         fetch(GAS_API_URL + '?new_user=1')
             .then(res => res.json())
             .then(updateCounters)
             .catch(err => console.error('後端連線失敗:', err));
     } else {
-        // 老玩家：僅增加遊玩次數
         fetch(GAS_API_URL)
             .then(res => res.json())
             .then(updateCounters)

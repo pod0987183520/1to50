@@ -1,5 +1,5 @@
 // 🌟 升級版本號至 v3，讓手機得知設定已變更
-const CACHE_NAME = '1to50-pwa-cache-v4.01';
+const CACHE_NAME = '1to50-pwa-cache-v4.02';
 
 // 🌟 變更：將快取清單更新為你全新的圖片名稱
 const ASSETS_TO_CACHE = [

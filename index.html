@@ -28,9 +28,13 @@
         <div id="gameGrid" class="grid"></div>
     </div>
 
-    <div class="counter-display">
-        累積遊玩：<span id="totalPlays">0</span> 次<br>
-        玩家總數：<span id="totalVisitors">0</span> 人
+    <!-- 右下角：難度按鈕 + 計數器並排 -->
+    <div class="bottom-right-bar">
+        <button id="difficultyBtn" class="btn-difficulty">🎯 難度</button>
+        <div class="counter-display">
+            累積遊玩：<span id="totalPlays">0</span> 次<br>
+            玩家總數：<span id="totalVisitors">0</span> 人
+        </div>
     </div>
 
     <button id="pwaFixedBtn" class="pwa-btn hidden">📲 加入主畫面</button>
@@ -67,6 +71,32 @@
         <button id="lineCloseBtn" class="btn-guide-close">關閉提示</button>
     </div>
 
+    <!-- 難度選擇彈窗 -->
+    <div id="difficultyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">🎯 選擇難度</div>
+            <div class="difficulty-options">
+                <div class="difficulty-option" id="diff-x1" data-step="1">
+                    <div class="diff-label">標準模式</div>
+                    <div class="diff-desc">整數 1, 2, 3 … 50<br>共需點擊 50 次</div>
+                </div>
+                <div class="difficulty-option" id="diff-x2" data-step="2">
+                    <div class="diff-label">× 2 倍數</div>
+                    <div class="diff-desc">2, 4, 6 … 100<br>共需點擊 50 次</div>
+                </div>
+                <div class="difficulty-option" id="diff-x5" data-step="5">
+                    <div class="diff-label">× 5 倍數</div>
+                    <div class="diff-desc">5, 10, 15 … 250<br>共需點擊 50 次</div>
+                </div>
+                <div class="difficulty-option" id="diff-x7" data-step="7">
+                    <div class="diff-label">× 7 倍數</div>
+                    <div class="diff-desc">7, 14, 21 … 350<br>共需點擊 50 次</div>
+                </div>
+            </div>
+            <button id="closeDifficultyBtn" class="btn-close" style="margin-top: 15px;">關閉</button>
+        </div>
+    </div>
+
     <div id="resultModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">🎉 挑戰完成！</div>
@@ -80,7 +110,7 @@
     <div id="historyModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">📊 歷史戰績</div>
-            <div class="history-subtitle">保留近 90 天的最佳紀錄</div>
+            <div id="historyModeLabel" class="history-subtitle">保留近 90 天的最佳紀錄</div>
             <div id="historyList" class="history-list"></div>
             <button id="closeHistoryBtn" class="btn-close">關閉</button>
         </div>
