@@ -132,20 +132,30 @@ function getPraiseMessage(rawSeconds) {
     return "🌟 不錯喔！再玩一次，<br>讓我們一定可以突破400秒！";
 }
 
-// 輔助：設定提示數字（三位數自動縮小）
+// 輔助：判斷當前難度是否需要套用較小的字體大小（5的倍數、7的倍數或數字>=100）
+function shouldApplySmallFont(num) {
+    // 5的倍數 (step=5) 與 7的倍數 (step=7)：全程統一用 3位數的大小
+    if (currentDifficulty.step === 5 || currentDifficulty.step === 7) {
+        return true;
+    }
+    // 1~50 (step=1) 與 2的倍數 (step=2)：僅 >= 100 縮小 (100這個數字)
+    return num >= 100;
+}
+
+// 輔助：設定提示數字
 function setHintNumber(num) {
     DOM.hintNumber.innerText = num;
-    if (num >= 100) {
+    if (shouldApplySmallFont(num)) {
         DOM.hintNumber.classList.add('three-digit');
     } else {
         DOM.hintNumber.classList.remove('three-digit');
     }
 }
 
-// 輔助：設定格子數字與三位數字自動縮小
+// 輔助：設定格子數字
 function setCellNumber(cell, num) {
     cell.innerText = num;
-    if (num >= 100) {
+    if (shouldApplySmallFont(num)) {
         cell.classList.add('three-digit');
     } else {
         cell.classList.remove('three-digit');
