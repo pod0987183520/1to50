@@ -38,21 +38,57 @@ body {
 
 /* 頂部資訊列 */
 .info-bar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 5px; font-size: clamp(20px, 5vw, 28px);
-    font-weight: bold; color: var(--surface-text);
+    display: flex; justify-content: space-between; align-items: stretch;
+    padding: 5px;
+    font-weight: bold;
+    width: 100%; max-width: 600px;
 }
-.right-controls { display: flex; align-items: center; gap: 10px; }
 
-.timer { color: var(--timer-color); font-variant-numeric: tabular-nums; }
+/* 右側：計時器 + 按鈕 上下疊排 */
+.right-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 4px;
+}
 
+.timer { color: var(--timer-color); font-variant-numeric: tabular-nums; font-size: clamp(16px, 4vw, 22px); font-weight: bold; }
+
+/* 左側提示框 - 分層天隢 */
 .target-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     background-color: var(--hint-bg);
-    color: var(--hint-text);
-    padding: 4px 12px;
-    border-radius: 8px;
+    padding: 4px 14px 6px;
+    border-radius: 10px;
     border: 2px solid var(--hint-border);
-    text-shadow: 0 0 8px rgba(255, 204, 2, 0.4);  /* 亮黃微光 */
+    min-width: 90px;
+}
+
+/* 上層：請點選 小字 */
+.hint-label {
+    font-size: 13px;
+    color: #81c784;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 1px;
+}
+
+/* 下層：目標數字 超大 */
+.hint-number {
+    font-size: clamp(36px, 13vmin, 58px);
+    font-weight: 900;
+    color: var(--hint-text);
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(255,204,2,0.55), 0 0 24px rgba(255,204,2,0.25);
+}
+
+/* 三位數自動縮小 */
+.hint-number.three-digit {
+    font-size: clamp(24px, 9vmin, 40px);
 }
 
 .btn-history {

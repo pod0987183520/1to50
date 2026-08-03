@@ -27,6 +27,7 @@ const DOM = {
     grid: document.getElementById('gameGrid'),
     timer: document.getElementById('timerDisplay'),
     hint: document.getElementById('hintDisplay'),
+    hintNumber: document.getElementById('hintNumber'),
     resultModal: document.getElementById('resultModal'),
     finalScore: document.getElementById('finalScore'),
     praiseMsg: document.getElementById('praiseMessage'),
@@ -131,6 +132,16 @@ function getPraiseMessage(rawSeconds) {
     return "🌟 不錯喔！再玩一次，<br>讓我們一定可以突破400秒！";
 }
 
+// 輔助：設定提示數字（三位數自動縮小）
+function setHintNumber(num) {
+    DOM.hintNumber.innerText = num;
+    if (num >= 100) {
+        DOM.hintNumber.classList.add('three-digit');
+    } else {
+        DOM.hintNumber.classList.remove('three-digit');
+    }
+}
+
 // 輔助：設定格子數字與三位數字自動縮小
 function setCellNumber(cell, num) {
     cell.innerText = num;
@@ -178,7 +189,7 @@ function initGame() {
     startTime = null;
     clearInterval(timerInterval);
     DOM.timer.innerText = "⏱️ 0.00 秒";
-    DOM.hint.innerText = `請點選：${currentTarget}`;
+    setHintNumber(currentTarget);
     DOM.grid.innerHTML = '';
 
     // 第一輪：step*1 ~ step*25（共 25 格）
@@ -251,7 +262,7 @@ function handleCellClick(cell) {
     if (currentTarget > step * TOTAL_CLICKS) {
         endGame();
     } else {
-        DOM.hint.innerText = `請點選：${currentTarget}`;
+        setHintNumber(currentTarget);
     }
 }
 

@@ -17,7 +17,12 @@
 </head>
 <body>
     <div class="info-bar" style="width: 100%; max-width: 600px;">
-        <div id="hintDisplay" class="target-hint">請點選：1</div>
+        <!-- 左側：提示框（標籤 + 超大數字） -->
+        <div id="hintDisplay" class="target-hint">
+            <span class="hint-label">請點選</span>
+            <span id="hintNumber" class="hint-number">1</span>
+        </div>
+        <!-- 右側：計時器 + 歷史按鈕 上下疊排 -->
         <div class="right-controls">
             <div id="timerDisplay" class="timer">⏱️ 0.00 秒</div>
             <button id="historyBtn" class="btn-history">📊</button>
