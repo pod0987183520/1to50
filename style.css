@@ -22,18 +22,20 @@
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-color);
-    min-height: 100dvh;
+    min-height: 100vh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 2vh 4vw;
+    padding: 10px 16px;
     user-select: none; -webkit-user-select: none;
-    overflow: hidden; touch-action: manipulation;
+    overflow-x: hidden;
+    touch-action: manipulation;
 }
 
 .game-container {
-    width: 100%; max-width: 600px;
+    width: 100%; max-width: 550px;
     display: flex; flex-direction: column;
-    gap: 15px; margin: 0 auto;
+    gap: 12px; margin: 0 auto;
+    align-items: center;
 }
 
 /* 頂部資訊列 */
@@ -104,9 +106,9 @@ body {
     display: grid;
     gap: 4px;
     width: 100%;
+    max-width: min(100%, 70vh, 500px);
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    max-width: min(100%, 75dvh);
     margin: 0 auto;
     aspect-ratio: 1 / 1;
     touch-action: none;
