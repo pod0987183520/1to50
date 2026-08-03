@@ -217,40 +217,40 @@ body {
 .line-steps { font-size: 22px; line-height: 1.8; text-align: left; background: #0a130c; padding: 20px; border-radius: 15px; border: 2px dashed #2e7d32; }
 
 /* ==========================================
-   難度按鈕（深綠色系統一）
+   難度按鈕（加大老人適用）
    ========================================== */
 .btn-difficulty {
     pointer-events: all;
     background: linear-gradient(135deg, #2e7d4f 0%, #1b5e35 100%);
-    color: #c8e6c9;
-    border: 1px solid #4caf50;
-    padding: 5px 11px;
+    color: #ffffff;
+    border: 2px solid #66bb6a;
+    padding: 8px 16px;
     border-radius: 50px;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(76,175,80,0.3);
     transition: transform 0.15s, box-shadow 0.15s;
     white-space: nowrap;
-    line-height: 1.8;
+    line-height: 1.4;
 }
 .btn-difficulty:active {
     transform: translateY(2px);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
 }
 
 /* ==========================================
-   難度選擇彈窗（暗綠色系）
+   難度選擇彈窗（暗綠色系 + 超大文字卡片）
    ========================================== */
 .difficulty-options {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 10px 0;
+    gap: 12px;
+    margin: 15px 0;
 }
 .difficulty-option {
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 16px 20px;
+    border-radius: 16px;
     border: 2px solid #2e5e37;
     background: #162819;
     cursor: pointer;
@@ -265,24 +265,24 @@ body {
 .difficulty-option.active {
     border-color: #66bb6a;
     background: linear-gradient(135deg, #1e3a22 0%, #1b3a28 100%);
-    box-shadow: 0 2px 10px rgba(76,175,80,0.3);
+    box-shadow: 0 4px 12px rgba(76,175,80,0.35);
 }
 .diff-label {
-    font-size: 20px;
-    font-weight: bold;
-    color: #c8e6c9;
-    margin-bottom: 4px;
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 6px;
 }
 .difficulty-option.active .diff-label {
-    color: #a5d6a7;
+    color: #ffcc02; /* 選擇項目標題改為鮮豔亮黃 */
 }
 .diff-desc {
-    font-size: 14px;
-    color: #81c784;
+    font-size: 16px;
+    color: #a5d6a7;
     line-height: 1.5;
 }
 .difficulty-option.active .diff-desc {
-    color: #66bb6a;
+    color: #81c784;
 }
 
 @media (max-width: 768px) {
