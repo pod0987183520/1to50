@@ -134,8 +134,9 @@ function getPraiseMessage(rawSeconds) {
 
 // 輔助：判斷當前難度是否需要套用較小的字體大小（5的倍數、7的倍數或數字>=100）
 function shouldApplySmallFont(num) {
+    const step = MODES[currentMode].step;
     // 5的倍數 (step=5) 與 7的倍數 (step=7)：全程統一用 3位數的大小
-    if (currentDifficulty.step === 5 || currentDifficulty.step === 7) {
+    if (step === 5 || step === 7) {
         return true;
     }
     // 1~50 (step=1) 與 2的倍數 (step=2)：僅 >= 100 縮小 (100這個數字)
