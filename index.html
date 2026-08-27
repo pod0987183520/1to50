@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.01">
+    <link rel="stylesheet" href="style.css?v=5.02">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -117,13 +117,7 @@
                 </div>
                 
                 <!-- 移至[請點選]提示右側的難度按鈕 -->
-                <button id="difficultyBtn" class="btn-difficulty-inline" onclick="openDifficultyModal()" title="點擊切換遊戲難度">
-                    <span class="diff-btn-icon">🎯</span>
-                    <div class="diff-btn-text-group">
-                        <span class="diff-btn-title">難度</span>
-                        <span id="currentModeLabel" class="diff-btn-val">標準 1~50</span>
-                    </div>
-                </button>
+                <button id="difficultyBtn" class="btn-difficulty-inline" onclick="openDifficultyModal()" title="點擊切換遊戲難度">🎯 難度</button>
             </div>
 
             <!-- 右側：計時器 + 歷史戰績按鈕 -->
@@ -230,12 +224,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.01"></script>
+    <script src="game.js?v=5.02"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.01')
+                navigator.serviceWorker.register('sw.js?v=5.02')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
