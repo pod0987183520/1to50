@@ -287,7 +287,7 @@ function endGame() {
     DOM.finalScore.innerText = `本次成績：${finalTime} 秒`;
     DOM.praiseMsg.innerHTML = getPraiseMessage(finalTime);
     
-    DOM.resultModal.classList.add('show');
+    DOM.resultModal.classList.remove('hidden');
     saveScoreToLocal(finalTime, nowTimestamp);
 }
 
@@ -309,11 +309,13 @@ function updateDifficultyModal() {
 
 window.openDifficultyModal = function openDifficultyModal() {
     updateDifficultyModal();
-    DOM.difficultyModal.classList.add('show');
+    const modal = document.getElementById('difficultyModal');
+    if (modal) modal.classList.remove('hidden');
 };
 
 window.closeDifficultyModal = function closeDifficultyModal() {
-    DOM.difficultyModal.classList.remove('show');
+    const modal = document.getElementById('difficultyModal');
+    if (modal) modal.classList.add('hidden');
 };
 
 // ==========================================
@@ -406,7 +408,6 @@ window.submitFeedback = function submitFeedback() {
         });
         localStorage.setItem('game_user_feedbacks', JSON.stringify(feedbackList));
 
-        // 發送通知到後端
         if (GAS_API_URL) {
             const feedbackUrl = GAS_API_URL + (GAS_API_URL.includes('?') ? '&' : '?') 
                 + 'action=feedback'
@@ -430,33 +431,15 @@ window.submitFeedback = function submitFeedback() {
 };
 
 // ==========================================
-// 7. 事件綁定與初始化
+// 7. 歷史戰績與結算事件綁定
 // ==========================================
-document.getElementById('restartBtn').onclick = () => {
-    DOM.resultModal.classList.remove('show');
+window.restartGame = function restartGame() {
+    const modal = document.getElementById('resultModal');
+    if (modal) modal.classList.add('hidden');
     initGame();
 };
 
-// 點擊難度選項：切換並重開局
-Object.keys(MODES).forEach(step => {
-    const el = document.getElementById(`diff-x${step}`);
-    if (el) {
-        el.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            currentMode = parseInt(step);
-            closeDifficultyModal();
-            initGame();
-        });
-    }
-});
-
-// 點擊彈窗背景關閉
-DOM.difficultyModal.addEventListener('pointerdown', (e) => {
-    if (e.target === DOM.difficultyModal) closeDifficultyModal();
-});
-
-// 歷史戰績
-document.getElementById('historyBtn').onclick = () => {
+window.openHistoryModal = function openHistoryModal() {
     let history = [];
     try {
         const stored = localStorage.getItem(getHistoryKey());
@@ -466,29 +449,53 @@ document.getElementById('historyBtn').onclick = () => {
         history = [];
     }
 
-    DOM.historyModeLabel.textContent = `【${MODES[currentMode].label}】保留近 90 天的最佳紀錄`;
+    if (DOM.historyModeLabel) {
+        DOM.historyModeLabel.textContent = `【${MODES[currentMode].label}】保留近 90 天的最佳紀錄`;
+    }
 
-    DOM.historyList.innerHTML = history.length === 0 
-        ? '<p style="color: #94a3b8; text-align:center; padding: 20px; font-size: 16px;">目前尚無紀錄，趕快去挑戰一局吧！</p>'
-        : history.map((item, i) => `
-            <div style="display: flex; justify-content: space-between; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 16px;">
-                <span style="color: #cbd5e1;">第 ${history.length - i} 次 (${item.date || '未知'})</span>
-                <strong style="color: #ffcc02;">${item.score} 秒</strong>
-            </div>
-        `).join('');
-    DOM.historyModal.classList.add('show');
+    if (DOM.historyList) {
+        DOM.historyList.innerHTML = history.length === 0 
+            ? '<p style="color: #94a3b8; text-align:center; padding: 20px; font-size: 16px;">目前尚無紀錄，趕快去挑戰一局吧！</p>'
+            : history.map((item, i) => `
+                <div style="display: flex; justify-content: space-between; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 16px;">
+                    <span style="color: #cbd5e1;">第 ${history.length - i} 次 (${item.date || '未知'})</span>
+                    <strong style="color: #ffcc02;">${item.score} 秒</strong>
+                </div>
+            `).join('');
+    }
+    const modal = document.getElementById('historyModal');
+    if (modal) modal.classList.remove('hidden');
 };
 
-document.getElementById('closeHistoryBtn').onclick = () => DOM.historyModal.classList.remove('show');
-window.addEventListener('pointerdown', (e) => {
-    if (e.target === DOM.historyModal) DOM.historyModal.classList.remove('show');
-    if (e.target === DOM.resultModal) DOM.resultModal.classList.remove('show');
-    const fbModal = document.getElementById('feedbackModal');
-    if (e.target === fbModal) closeFeedbackModal();
-    const androidModal = document.getElementById('androidInstallGuideModal');
-    if (e.target === androidModal) androidModal.classList.add('hidden');
-    const iosModal = document.getElementById('iosInstallModal');
-    if (e.target === iosModal) iosModal.classList.add('hidden');
+window.closeHistoryModal = function closeHistoryModal() {
+    const modal = document.getElementById('historyModal');
+    if (modal) modal.classList.add('hidden');
+};
+
+// 點擊難度選項：切換並重開局
+Object.keys(MODES).forEach(step => {
+    const el = document.getElementById(`diff-x${step}`);
+    if (el) {
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMode = parseInt(step);
+            closeDifficultyModal();
+            initGame();
+        });
+    }
+});
+
+// 歷史按鈕綁定
+const btnHistory = document.getElementById('historyBtn');
+if (btnHistory) {
+    btnHistory.onclick = () => openHistoryModal();
+}
+
+// 點擊遮罩背景自動關閉彈窗
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.add('hidden');
+    }
 });
 
 // 頁面載入生命週期

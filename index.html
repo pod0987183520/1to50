@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.00">
+    <link rel="stylesheet" href="style.css?v=5.01">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -155,7 +155,7 @@
     </main>
 
     <!-- 難度選擇彈窗 -->
-    <div id="difficultyModal" class="modal-overlay">
+    <div id="difficultyModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-title">🎯 選擇難度</div>
             <div class="difficulty-options">
@@ -181,23 +181,23 @@
     </div>
 
     <!-- 挑戰完成結算彈窗 -->
-    <div id="resultModal" class="modal-overlay">
+    <div id="resultModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-title">🎉 挑戰完成！</div>
             <div id="finalScore" class="modal-score">本次成績：0.00 秒</div>
             <div id="rankMessage" class="modal-rank"></div>
             <div id="praiseMessage" class="modal-praise"></div>
-            <button id="restartBtn" class="btn-restart">再玩一次</button>
+            <button id="restartBtn" class="btn-restart" onclick="restartGame()">再玩一次</button>
         </div>
     </div>
 
     <!-- 歷史戰績彈窗 -->
-    <div id="historyModal" class="modal-overlay">
+    <div id="historyModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-title">📊 歷史戰績</div>
             <div id="historyModeLabel" class="history-subtitle">保留近 90 天的最佳紀錄</div>
             <div id="historyList" class="history-list"></div>
-            <button id="closeHistoryBtn" class="btn-close">關閉</button>
+            <button id="closeHistoryBtn" class="btn-close" onclick="closeHistoryModal()">關閉</button>
         </div>
     </div>
 
@@ -230,12 +230,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.00"></script>
+    <script src="game.js?v=5.01"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.00')
+                navigator.serviceWorker.register('sw.js?v=5.01')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
