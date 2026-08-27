@@ -200,12 +200,12 @@ body {
 }
 
 .info-column-label {
-    font-size: 16px;
+    font-size: clamp(18px, 5vw, 22px);
     font-weight: 900;
     color: #86efac;
     letter-spacing: 0.5px;
     line-height: 1;
-    text-shadow: 0 0 8px rgba(134, 239, 172, 0.4);
+    text-shadow: 0 0 10px rgba(134, 239, 172, 0.45);
 }
 
 /* 左側「提醒」提示框 (金黃夜空黑藍底 + 耀眼光暈，與綠色5x5徹底區別，防止誤觸) */
@@ -394,12 +394,13 @@ body {
     flex-shrink: 0;
 }
 
-/* 第一行：App設計:陳新昱 與 我想建議 緊靠置中 */
+/* 最後一行：App設計:陳新昱 與 我想建議 緊靠置中 (位於最底端防止誤觸) */
 .footer-design-bar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    margin-top: 2px;
     margin-bottom: 0;
     flex-wrap: nowrap;
 }

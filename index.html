@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.07">
+    <link rel="stylesheet" href="style.css?v=5.08">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -107,11 +107,11 @@
     <!-- 主容器 -->
     <main class="main-container">
         
-        <!-- 頂部資訊列：左側請點選指示 + 右側難度設定與計時排行榜 -->
+        <!-- 頂部資訊列：左側提醒指示 + 右側難度設定與計時排行榜 -->
         <div class="info-bar">
-            <!-- 左側：上方「請點選」標籤 + 下方目標數字方框 -->
+            <!-- 左側：上方「提醒」標籤 + 下方目標數字方框 -->
             <div class="info-column">
-                <span class="info-column-label">請點選</span>
+                <span class="info-column-label">提醒</span>
                 <div id="hintDisplay" class="target-hint" title="目前應點選的目標數字">
                     <span id="hintNumber" class="hint-number">1</span>
                 </div>
@@ -140,17 +140,17 @@
             <div id="gameGrid" class="grid"></div>
         </div>
 
-        <!-- 底部版權與延緩失智陪伴聲明 (仿照小股同學框架) -->
+        <!-- 底部版權與延緩失智陪伴聲明 (安全排版：按鈕移至最底端防止誤觸) -->
         <footer class="app-footer">
-            <div class="footer-design-bar">
-                <span class="footer-design-text">App設計:陳新昱</span>
-                <button type="button" class="btn-footer-suggest" onclick="openFeedbackModal()" title="點擊向陳新昱提供寶貴建議">💡 我想建議</button>
-            </div>
             <p class="footer-notice">此為延緩失智健腦遊戲，每日練習活化大腦</p>
             <div class="footer-counters">
                 <span>累積遊玩：<strong id="totalPlays">0</strong> 次</span>
                 <span class="counter-sep">|</span>
                 <span>玩家總數：<strong id="totalVisitors">0</strong> 人</span>
+            </div>
+            <div class="footer-design-bar">
+                <span class="footer-design-text">App設計:陳新昱</span>
+                <button type="button" class="btn-footer-suggest" onclick="openFeedbackModal()" title="點擊向陳新昱提供寶貴建議">💡 我想建議</button>
             </div>
         </footer>
 
@@ -232,12 +232,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.07"></script>
+    <script src="game.js?v=5.08"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.07')
+                navigator.serviceWorker.register('sw.js?v=5.08')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
