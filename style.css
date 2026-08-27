@@ -378,15 +378,36 @@ body {
 }
 
 /* ==========================================
+   3.5 雙分隔線 (5x5 上方與下方各兩行分隔線)
+   ========================================== */
+.divider-double {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 2px auto;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.divider-line {
+    width: 100%;
+    height: 1.5px;
+    background: linear-gradient(90deg, rgba(74, 222, 128, 0.08) 0%, rgba(74, 222, 128, 0.45) 50%, rgba(74, 222, 128, 0.08) 100%);
+    border-radius: 1px;
+}
+
+/* ==========================================
    4. 底部版權與陪伴聲明 (安全防誤觸行距、三行等大字級)
    ========================================== */
 .app-footer {
     width: 100%;
     max-width: 480px;
-    margin: 12px auto 0 auto; /* 安全防誤觸間距：避免長者點擊第5排格子時誤觸<我想建議> */
-    padding: 6px 2px 2px 2px;
+    margin: 6px auto 0 auto; /* 安全防誤觸間距 */
+    padding: 2px 2px 2px 2px;
     text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: none; /* 由雙分隔線統一取代 */
     display: flex;
     flex-direction: column;
     align-items: center;
