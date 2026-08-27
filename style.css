@@ -415,22 +415,22 @@ body {
     flex-shrink: 0;
 }
 
-/* 最後一行：App設計:陳新昱 與 我想建議 緊靠置中 (位於最底端防止誤觸) */
+/* 最後一行：App設計:陳新昱 與 我想建議 緊靠置中 (位於最底端防止誤觸，字級調大) */
 .footer-design-bar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 2px;
+    margin-top: 3px;
     margin-bottom: 0;
     flex-wrap: nowrap;
 }
 
 .footer-design-text {
-    font-size: clamp(16px, 4.4vw, 19px);
+    font-size: clamp(18px, 5vw, 21px);
     font-weight: 900;
     color: #fef08a;
-    text-shadow: 0 0 10px rgba(254, 240, 138, 0.35);
+    text-shadow: 0 0 10px rgba(254, 240, 138, 0.4);
     line-height: 1.2;
     white-space: nowrap;
     letter-spacing: 0.5px;
@@ -440,12 +440,12 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     color: #ffffff;
-    font-size: clamp(14px, 3.8vw, 16px);
+    font-size: clamp(15px, 4.2vw, 18px);
     font-weight: 900;
-    padding: 3px 12px;
+    padding: 4px 14px;
     border-radius: 999px;
     border: 1.5px solid #38bdf8;
     box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
@@ -460,7 +460,7 @@ body {
     background: #075985;
 }
 
-/* 第二行：陪伴聲明 (與第三行字級一致) */
+/* 第一行：陪伴聲明 */
 .footer-notice {
     font-size: clamp(14px, 4vw, 17px);
     font-weight: 800;
@@ -471,9 +471,9 @@ body {
     margin: 0;
 }
 
-/* 第三行：計數器 (與第二行字級一致) */
+/* 第二行：計數器 (字級調大一級) */
 .footer-counters {
-    font-size: clamp(14px, 4vw, 17px);
+    font-size: clamp(16px, 4.5vw, 19px);
     color: #a5d6a7;
     font-weight: 800;
     display: flex;
@@ -486,7 +486,7 @@ body {
 
 .footer-counters strong {
     color: #80cbc4;
-    font-size: clamp(14px, 4vw, 17px);
+    font-size: clamp(16px, 4.5vw, 19px);
     font-weight: 900;
 }
 
