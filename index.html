@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.05">
+    <link rel="stylesheet" href="style.css?v=5.06">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -107,21 +107,25 @@
     <!-- 主容器 -->
     <main class="main-container">
         
-        <!-- 頂部資訊列：左側目標提示 + 右側正方形難度與計時排行榜 -->
+        <!-- 頂部資訊列：左側提醒指示 + 右側難度設定與計時排行榜 -->
         <div class="info-bar">
-            <!-- 左側：[請點選]提示框 -->
-            <div id="hintDisplay" class="target-hint" title="目前應點選的目標數字">
-                <span class="hint-label">請點選</span>
-                <span id="hintNumber" class="hint-number">1</span>
+            <!-- 左側：上方「提醒」標籤 + 下方目標數字方框 -->
+            <div class="info-column">
+                <span class="info-column-label">提醒</span>
+                <div id="hintDisplay" class="target-hint" title="目前應點選的目標數字">
+                    <span id="hintNumber" class="hint-number">1</span>
+                </div>
             </div>
 
-            <!-- 右側群組：正方形[難度]按鈕 + 排行榜與計時器 (靠右對齊) -->
+            <!-- 右側群組：上方「難度」標籤+放大靶心按鈕 + 排行榜與計時器 (靠右對齊) -->
             <div class="right-controls-group">
-                <!-- 正方形難度按鈕，與[請點選]等大，緊鄰排行榜左側 -->
-                <button id="difficultyBtn" class="btn-difficulty-square" onclick="openDifficultyModal()" title="點擊切換遊戲難度">
-                    <span class="diff-square-icon">🎯</span>
-                    <span class="diff-square-label">難度</span>
-                </button>
+                <!-- 難度直列群組：上方標籤 + 下方放大靶心正方形按鈕 -->
+                <div class="info-column">
+                    <span class="info-column-label">難度</span>
+                    <button id="difficultyBtn" class="btn-difficulty-square" onclick="openDifficultyModal()" title="點擊切換遊戲難度">
+                        <span class="diff-square-icon">🎯</span>
+                    </button>
+                </div>
                 
                 <!-- 計時器 + 歷史戰績(排行榜)按鈕 -->
                 <div class="right-timer-box">
@@ -228,12 +232,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.05"></script>
+    <script src="game.js?v=5.06"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.05')
+                navigator.serviceWorker.register('sw.js?v=5.06')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
