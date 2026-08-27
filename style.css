@@ -140,6 +140,30 @@ body {
     background: #047857;
 }
 
+/* PWA 獨立 App 模式 (已安裝開啟或由主畫面開啟時，自動隱藏頂端列「📲 安裝App」) */
+.is-pwa-standalone #btn-header-install,
+html.is-pwa-standalone #btn-header-install {
+    display: none !important;
+}
+
+@media all and (display-mode: standalone) {
+    #btn-header-install {
+        display: none !important;
+    }
+}
+
+@media all and (display-mode: fullscreen) {
+    #btn-header-install {
+        display: none !important;
+    }
+}
+
+@media all and (display-mode: minimal-ui) {
+    #btn-header-install {
+        display: none !important;
+    }
+}
+
 .btn-settings-gear {
     width: 34px;
     height: 34px;

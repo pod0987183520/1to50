@@ -323,9 +323,35 @@ window.closeDifficultyModal = function closeDifficultyModal() {
 // ==========================================
 window.deferredPrompt = null;
 
+// PWA 狀態檢查與安裝按鈕隱藏
+function updatePWAInstallVisibility() {
+    const isPWA = (window.matchMedia && (
+                    window.matchMedia('(display-mode: standalone)').matches ||
+                    window.matchMedia('(display-mode: fullscreen)').matches ||
+                    window.matchMedia('(display-mode: minimal-ui)').matches
+                )) ||
+                window.navigator.standalone === true ||
+                window.location.search.indexOf('source=pwa') !== -1 ||
+                (document.referrer && document.referrer.indexOf('android-app://') === 0) ||
+                localStorage.getItem('1to50_pwa_installed') === 'true';
+
+    const btnHeader = document.getElementById('btn-header-install');
+    if (isPWA) {
+        document.documentElement.classList.add('is-pwa-standalone');
+        if (btnHeader) btnHeader.classList.add('hidden');
+    }
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     window.deferredPrompt = e;
+    // 若瀏覽器觸發了可安裝提示且當前非獨立 App，可重置安裝狀態
+    if (!window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone) {
+        localStorage.removeItem('1to50_pwa_installed');
+        document.documentElement.classList.remove('is-pwa-standalone');
+        const btnHeader = document.getElementById('btn-header-install');
+        if (btnHeader) btnHeader.classList.remove('hidden');
+    }
 });
 
 window.triggerPWAInstall = function triggerPWAInstall() {
@@ -337,6 +363,7 @@ window.triggerPWAInstall = function triggerPWAInstall() {
         window.deferredPrompt.prompt();
         window.deferredPrompt.userChoice.then((choiceResult) => {
             if (choiceResult && choiceResult.outcome === 'accepted') {
+                localStorage.setItem('1to50_pwa_installed', 'true');
                 document.documentElement.classList.add('is-pwa-standalone');
                 const btnHeader = document.getElementById('btn-header-install');
                 if (btnHeader) btnHeader.classList.add('hidden');
@@ -363,11 +390,16 @@ window.triggerPWAInstall = function triggerPWAInstall() {
 };
 
 window.addEventListener('appinstalled', () => {
+    localStorage.setItem('1to50_pwa_installed', 'true');
     document.documentElement.classList.add('is-pwa-standalone');
     const btnHeader = document.getElementById('btn-header-install');
     if (btnHeader) btnHeader.classList.add('hidden');
     window.deferredPrompt = null;
 });
+
+// 初始化即刻檢測
+updatePWAInstallVisibility();
+window.addEventListener('DOMContentLoaded', updatePWAInstallVisibility);
 
 // ==========================================
 // 6. 系統設計與開發建議反饋彈窗 (Feedback Modal)

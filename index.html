@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.10">
+    <link rel="stylesheet" href="style.css?v=5.11">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -35,7 +35,8 @@
                             )) ||
                             window.navigator.standalone === true ||
                             window.location.search.indexOf('source=pwa') !== -1 ||
-                            (document.referrer && document.referrer.indexOf('android-app://') === 0);
+                            (document.referrer && document.referrer.indexOf('android-app://') === 0) ||
+                            localStorage.getItem('1to50_pwa_installed') === 'true';
                 if (isPWA) {
                     document.documentElement.classList.add('is-pwa-standalone');
                 }
@@ -244,12 +245,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.10"></script>
+    <script src="game.js?v=5.11"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.10')
+                navigator.serviceWorker.register('sw.js?v=5.11')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
