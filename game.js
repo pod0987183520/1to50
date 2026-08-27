@@ -10,17 +10,15 @@ const TOTAL_CLICKS = 50;   // 所有難度固定點擊 50 次
 // ==========================================
 // 難度設定
 // ==========================================
-// step: 每格數字的間距
-// key:  localStorage 儲存鍵，各難度分開記錄
 const MODES = {
-    1: { step: 1, label: '標準 1~50',  key: 'game_1to50_history_x1' },
-    2: { step: 2, label: '×2 倍數',   key: 'game_1to50_history_x2' },
-    5: { step: 5, label: '×5 倍數',   key: 'game_1to50_history_x5' },
-    7: { step: 7, label: '×7 倍數',   key: 'game_1to50_history_x7' }
+    1: { step: 1, label: '標準 1~50',  shortLabel: '標準 1~50', key: 'game_1to50_history_x1' },
+    2: { step: 2, label: '× 2 倍數',   shortLabel: '× 2 倍數',   key: 'game_1to50_history_x2' },
+    5: { step: 5, label: '× 5 倍數',   shortLabel: '× 5 倍數',   key: 'game_1to50_history_x5' },
+    7: { step: 7, label: '× 7 倍數',   shortLabel: '× 7 倍數',   key: 'game_1to50_history_x7' }
 };
 let currentMode = 1;   // 預設標準難度
 
-// Google Apps Script 後端 API 網址
+// Google Apps Script 後端 API 網址 (計數與反饋)
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzFXNURbzrMozLkwZ5HlJDiTN9arH5Ihel2gGT2E4I7pjEzQ-RFmU3Cn8eE50LsCyXugQ/exec';
 
 const DOM = {
@@ -28,6 +26,7 @@ const DOM = {
     timer: document.getElementById('timerDisplay'),
     hint: document.getElementById('hintDisplay'),
     hintNumber: document.getElementById('hintNumber'),
+    currentModeLabel: document.getElementById('currentModeLabel'),
     resultModal: document.getElementById('resultModal'),
     finalScore: document.getElementById('finalScore'),
     praiseMsg: document.getElementById('praiseMessage'),
@@ -54,7 +53,7 @@ function getHistoryKey() {
     return MODES[currentMode].key;
 }
 
-// 👑 雙軌排行演算法 (強固防禦版：絕不因舊資料崩潰)
+// 👑 雙軌排行演算法 (強固防禦版)
 function calculateRankInHistory(currentScore, timestamp) {
     const currentSeconds = parseFloat(currentScore);
     let history = [];
@@ -81,7 +80,7 @@ function calculateRankInHistory(currentScore, timestamp) {
     const todayRank = todayRecords.findIndex(item => item.timestamp === timestamp) + 1;
     const todayBest = parseFloat(todayRecords[0].score);
 
-    let todayHtml = `<div style="background-color: #ebf8ff; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #bee3f8; color: #2b6cb0;">`;
+    let todayHtml = `<div style="background-color: rgba(56, 189, 248, 0.15); padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #38bdf8; color: #e0f2fe;">`;
     if (todayRank === 1) {
         todayHtml += `🏆 <strong>本日戰績：</strong><br>太厲害了！守住今天的冠軍寶座！`;
     } else {
@@ -93,7 +92,7 @@ function calculateRankInHistory(currentScore, timestamp) {
     // --- 軌道 2：歷史排行榜 ---
     allRecords.sort((a, b) => parseFloat(a.score) - parseFloat(b.score));
     
-    let historyHtml = `<div style="background-color: #f0fff4; padding: 10px; border-radius: 8px; border: 1px solid #c6f6d5; color: #2f855a;">`;
+    let historyHtml = `<div style="background-color: rgba(74, 222, 128, 0.15); padding: 10px; border-radius: 10px; border: 1px solid #4ade80; color: #dcfce7;">`;
     
     const isNewRecord = (allRecords[0].timestamp === timestamp);
     const historyRank = allRecords.findIndex(item => item.timestamp === timestamp) + 1;
@@ -101,7 +100,7 @@ function calculateRankInHistory(currentScore, timestamp) {
     if (isNewRecord) {
         const oldBest = allRecords.length > 1 ? allRecords[1].score : null;
         historyHtml += `📈 <strong>恭喜你刷新歷史紀錄 &lt;第一名&gt;</strong><br>`;
-        historyHtml += oldBest ? `(之前最佳成績僅為 ${oldBest} 秒)` : `(這是你的首戰紀錄喔！)`;
+        historyHtml += oldBest ? `(之前最佳成績為 ${oldBest} 秒)` : `(這是你的首戰紀錄喔！)`;
     } else if (historyRank <= 5) {
         const historyBest = parseFloat(allRecords[0].score);
         historyHtml += `📈 <strong>歷史排行榜第${convertToChinese(historyRank)}名：</strong><br>你的最高紀錄為 ${historyBest} 秒！`;
@@ -135,11 +134,7 @@ function getPraiseMessage(rawSeconds) {
 // 輔助：判斷當前難度是否需要套用較小的字體大小（5的倍數、7的倍數或數字>=100）
 function shouldApplySmallFont(num) {
     const step = MODES[currentMode].step;
-    // 5的倍數 (step=5) 與 7的倍數 (step=7)：全程統一用 3位數的大小
-    if (step === 5 || step === 7) {
-        return true;
-    }
-    // 1~50 (step=1) 與 2的倍數 (step=2)：僅 >= 100 縮小 (100這個數字)
+    if (step === 5 || step === 7) return true;
     return num >= 100;
 }
 
@@ -194,13 +189,18 @@ function saveScoreToLocal(score, timestamp) {
 // ==========================================
 function initGame() {
     const step = MODES[currentMode].step;
-    // currentTarget 從第一個數字開始（例如 step=2 → 從 2 開始）
     currentTarget = step * 1;
     gameActive = false;
     startTime = null;
     clearInterval(timerInterval);
     DOM.timer.innerText = "⏱️ 0.00 秒";
     setHintNumber(currentTarget);
+    
+    // 更新提示旁難度標籤
+    if (DOM.currentModeLabel) {
+        DOM.currentModeLabel.innerText = MODES[currentMode].shortLabel;
+    }
+
     DOM.grid.innerHTML = '';
 
     // 第一輪：step*1 ~ step*25（共 25 格）
@@ -213,7 +213,6 @@ function initGame() {
         cell.setAttribute('data-val', num);
         setCellNumber(cell, num);
         
-        // 👍 用 pointerdown 確保長輩左手指腹壓在螢幕邊緣時，右手依然能「一摸即中」防誤觸
         cell.addEventListener('pointerdown', () => {
             handleCellClick(cell);
         });
@@ -221,7 +220,6 @@ function initGame() {
         DOM.grid.appendChild(cell);
     });
 
-    // 更新難度彈窗選中狀態
     updateDifficultyModal();
 }
 
@@ -234,13 +232,9 @@ function handleCellClick(cell) {
         return; 
     }
     
-    // ==========================================
-    // 👑 兩全其美震動防禦演算法
-    // ==========================================
     const step = MODES[currentMode].step;
     if (navigator.vibrate) {
         if (currentTarget === step) {
-            // 第一下點擊：延遲 150ms 避開全螢幕/網址列收合的硬體忙碌期
             setTimeout(() => {
                 if (navigator.vibrate) navigator.vibrate(20);
             }, 150);
@@ -248,13 +242,11 @@ function handleCellClick(cell) {
             navigator.vibrate(20);
         }
     }
-    // ==========================================
     
     if (currentTarget === step && !gameActive) {
         gameActive = true;
         startTime = performance.now();
         timerInterval = setInterval(updateTimer, 10);
-        document.getElementById('androidBanner').classList.add('hidden');
     }
     
     // 第一輪（step*1 ~ step*25）→ 替換成第二輪（step*26 ~ step*50）
@@ -303,7 +295,6 @@ function endGame() {
 // 4. 難度選擇彈窗邏輯
 // ==========================================
 function updateDifficultyModal() {
-    // 更新選中狀態
     Object.keys(MODES).forEach(step => {
         const el = document.getElementById(`diff-x${step}`);
         if (el) {
@@ -316,33 +307,142 @@ function updateDifficultyModal() {
     });
 }
 
-function openDifficultyModal() {
+window.openDifficultyModal = function openDifficultyModal() {
     updateDifficultyModal();
     DOM.difficultyModal.classList.add('show');
-}
+};
 
-function closeDifficultyModal() {
+window.closeDifficultyModal = function closeDifficultyModal() {
     DOM.difficultyModal.classList.remove('show');
-}
+};
 
 // ==========================================
-// 5. 事件綁定與跨載具判斷
+// 5. PWA 一鍵安裝機制 (頂端列「📲 安裝App」專用)
+// ==========================================
+window.deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.deferredPrompt = e;
+});
+
+window.triggerPWAInstall = function triggerPWAInstall() {
+    const ua = (navigator.userAgent || '').toLowerCase();
+    const isIOS = /ipad|iphone|ipod/.test(ua) && !window.MSStream;
+
+    // 1. 若瀏覽器已捕獲原生 PWA 安裝事件
+    if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult && choiceResult.outcome === 'accepted') {
+                document.documentElement.classList.add('is-pwa-standalone');
+                const btnHeader = document.getElementById('btn-header-install');
+                if (btnHeader) btnHeader.classList.add('hidden');
+            }
+            window.deferredPrompt = null;
+        });
+        return;
+    }
+
+    // 2. 若為 iOS 裝置 (Safari 分享引導)
+    if (isIOS) {
+        const iosModal = document.getElementById('iosInstallModal');
+        if (iosModal) iosModal.classList.remove('hidden');
+        return;
+    }
+
+    // 3. Android / Chrome 備援引導
+    const androidModal = document.getElementById('androidInstallGuideModal');
+    if (androidModal) {
+        androidModal.classList.remove('hidden');
+    } else {
+        alert('📲 請點擊瀏覽器右上角「⋮」➜ 選擇「安裝應用程式」或「加到主畫面」即可安裝到桌面！');
+    }
+};
+
+window.addEventListener('appinstalled', () => {
+    document.documentElement.classList.add('is-pwa-standalone');
+    const btnHeader = document.getElementById('btn-header-install');
+    if (btnHeader) btnHeader.classList.add('hidden');
+    window.deferredPrompt = null;
+});
+
+// ==========================================
+// 6. 系統設計與開發建議反饋彈窗 (Feedback Modal)
+// ==========================================
+window.openFeedbackModal = function openFeedbackModal() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) modal.classList.remove('hidden');
+};
+
+window.closeFeedbackModal = function closeFeedbackModal() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) modal.classList.add('hidden');
+};
+
+window.submitFeedback = function submitFeedback() {
+    const name = (document.getElementById('feedback-input-name').value || '').trim();
+    const phone = (document.getElementById('feedback-input-phone').value || '').trim();
+    const content = (document.getElementById('feedback-input-content').value || '').trim();
+
+    if (!content) {
+        alert('請先填寫您的寶貴建議事項喔！謝謝您！');
+        return;
+    }
+
+    const btnSubmit = document.getElementById('btn-submit-feedback');
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = '✉️ 正在送出中...';
+    }
+
+    try {
+        const feedbackList = JSON.parse(localStorage.getItem('game_user_feedbacks') || '[]');
+        feedbackList.push({
+            name: name || '熱心玩家',
+            phone: phone || '未提供',
+            content: content,
+            time: new Date().toLocaleString('zh-TW')
+        });
+        localStorage.setItem('game_user_feedbacks', JSON.stringify(feedbackList));
+
+        // 發送通知到後端
+        if (GAS_API_URL) {
+            const feedbackUrl = GAS_API_URL + (GAS_API_URL.includes('?') ? '&' : '?') 
+                + 'action=feedback'
+                + '&name=' + encodeURIComponent(name || '熱心玩家')
+                + '&phone=' + encodeURIComponent(phone || '未提供')
+                + '&content=' + encodeURIComponent(content);
+            
+            fetch(feedbackUrl, { mode: 'no-cors' }).catch(() => {});
+        }
+    } catch(e) {}
+
+    setTimeout(() => {
+        alert('感謝您的寶貴建議！陳新昱已收到您的回饋，將持續優化遊戲體驗！');
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = '✉️ 送出建議';
+        }
+        document.getElementById('feedback-input-content').value = '';
+        closeFeedbackModal();
+    }, 600);
+};
+
+// ==========================================
+// 7. 事件綁定與初始化
 // ==========================================
 document.getElementById('restartBtn').onclick = () => {
     DOM.resultModal.classList.remove('show');
     initGame();
 };
 
-// 難度按鈕
-DOM.difficultyBtn.onclick = () => openDifficultyModal();
-document.getElementById('closeDifficultyBtn').onclick = () => closeDifficultyModal();
-
-// 點擊難度選項：直接切換並開始新遊戲，不需確認
+// 點擊難度選項：切換並重開局
 Object.keys(MODES).forEach(step => {
     const el = document.getElementById(`diff-x${step}`);
     if (el) {
         el.addEventListener('pointerdown', (e) => {
-            e.stopPropagation(); // 防止事件冒泡到背景關閉邏輯
+            e.stopPropagation();
             currentMode = parseInt(step);
             closeDifficultyModal();
             initGame();
@@ -355,6 +455,7 @@ DOM.difficultyModal.addEventListener('pointerdown', (e) => {
     if (e.target === DOM.difficultyModal) closeDifficultyModal();
 });
 
+// 歷史戰績
 document.getElementById('historyBtn').onclick = () => {
     let history = [];
     try {
@@ -365,99 +466,69 @@ document.getElementById('historyBtn').onclick = () => {
         history = [];
     }
 
-    // 顯示當前難度名稱
     DOM.historyModeLabel.textContent = `【${MODES[currentMode].label}】保留近 90 天的最佳紀錄`;
 
     DOM.historyList.innerHTML = history.length === 0 
-        ? '<p style="color: #4a5568; text-align:center; padding: 20px;">目前尚無紀錄，趕快去玩一局吧！</p>'
+        ? '<p style="color: #94a3b8; text-align:center; padding: 20px; font-size: 16px;">目前尚無紀錄，趕快去挑戰一局吧！</p>'
         : history.map((item, i) => `
-            <div style="display: flex; justify-content: space-between; padding: 10px 5px; border-bottom: 1px solid #edf2f7; font-size: 18px;">
-                <span style="color: #4a5568;">第 ${history.length - i} 次 (${item.date || '未知'})</span>
-                <strong style="color: #0f4c81;">${item.score} 秒</strong>
+            <div style="display: flex; justify-content: space-between; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 16px;">
+                <span style="color: #cbd5e1;">第 ${history.length - i} 次 (${item.date || '未知'})</span>
+                <strong style="color: #ffcc02;">${item.score} 秒</strong>
             </div>
         `).join('');
     DOM.historyModal.classList.add('show');
 };
 
 document.getElementById('closeHistoryBtn').onclick = () => DOM.historyModal.classList.remove('show');
-window.onclick = (e) => { if (e.target === DOM.historyModal) DOM.historyModal.classList.remove('show'); };
+window.addEventListener('pointerdown', (e) => {
+    if (e.target === DOM.historyModal) DOM.historyModal.classList.remove('show');
+    if (e.target === DOM.resultModal) DOM.resultModal.classList.remove('show');
+    const fbModal = document.getElementById('feedbackModal');
+    if (e.target === fbModal) closeFeedbackModal();
+    const androidModal = document.getElementById('androidInstallGuideModal');
+    if (e.target === androidModal) androidModal.classList.add('hidden');
+    const iosModal = document.getElementById('iosInstallModal');
+    if (e.target === iosModal) iosModal.classList.add('hidden');
+});
 
+// 頁面載入生命週期
 window.addEventListener('DOMContentLoaded', () => {
     initGame();
-    const ua = navigator.userAgent.toLowerCase();
-    const isLine = ua.includes('line');
-    const isIOS = /ipad|iphone|ipod/.test(ua) && !window.MSStream;
 
-    const pwaBtn = document.getElementById('pwaFixedBtn');
+    const ua = (navigator.userAgent || '').toLowerCase();
+    const isLine = ua.includes('line');
     const lineGuide = document.getElementById('lineGuideModal');
-    const iosModal = document.getElementById('iosModalB');
-    const androidBanner = document.getElementById('androidBanner');
 
     if (isLine) {
         if (!window.location.search.includes('openExternalBrowser=1')) {
             window.location.href += (window.location.href.includes('?') ? '&' : '?') + 'openExternalBrowser=1';
             return;
         }
-        lineGuide.classList.remove('hidden');
-        document.getElementById('lineCloseBtn').onclick = () => lineGuide.classList.add('hidden');
-        return; 
+        if (lineGuide) lineGuide.classList.remove('hidden');
     }
 
-    if (isIOS) {
-        pwaBtn.classList.remove('hidden');
-        pwaBtn.onclick = () => iosModal.classList.remove('hidden');
-        document.getElementById('iosCloseBtn').onclick = () => iosModal.classList.add('hidden');
-    }
-
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        pwaBtn.classList.remove('hidden');
-        androidBanner.classList.remove('hidden');
-    });
-
-    document.getElementById('androidInstallBtn').onclick = () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt = null;
-            androidBanner.classList.add('hidden');
-        }
-    };
-
-    document.getElementById('androidCloseBtn').onclick = () => androidBanner.classList.add('hidden');
-
-    pwaBtn.onclick = () => {
-        if (isIOS) iosModal.classList.remove('hidden');
-        else if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt = null;
-            androidBanner.classList.add('hidden');
-        }
-    };
-
-    window.addEventListener('appinstalled', () => {
-        pwaBtn.classList.add('hidden');
-        androidBanner.classList.add('hidden');
-        deferredPrompt = null;
-    });
-
-    // 🌟 串接全新的 Google Apps Script 雲端計數器
-    if (!localStorage.getItem('game_visited_flag')) {
-        localStorage.setItem('game_visited_flag', 'true');
+    // 串接 Google Apps Script 雲端計數器
+    if (!localStorage.getItem('game_1to50_visited_flag')) {
+        localStorage.setItem('game_1to50_visited_flag', 'true');
         fetch(GAS_API_URL + '?new_user=1')
             .then(res => res.json())
             .then(updateCounters)
-            .catch(err => console.error('後端連線失敗:', err));
+            .catch(err => console.error('後端計數連線失敗:', err));
     } else {
         fetch(GAS_API_URL)
             .then(res => res.json())
             .then(updateCounters)
-            .catch(err => console.error('後端連線失敗:', err));
+            .catch(err => console.error('後端計數連線失敗:', err));
     }
 });
 
 function updateCounters(data) {
-    if (data && data.plays) document.getElementById('totalPlays').innerText = data.plays;
-    if (data && data.visitors) document.getElementById('totalVisitors').innerText = data.visitors;
+    if (data && data.plays) {
+        const el = document.getElementById('totalPlays');
+        if (el) el.innerText = data.plays;
+    }
+    if (data && data.visitors) {
+        const el = document.getElementById('totalVisitors');
+        if (el) el.innerText = data.visitors;
+    }
 }

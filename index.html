@@ -3,79 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a1710">
     <meta name="google" content="notranslate">
-    <title>1到50(阿茲海默專用.訓練遊戲)</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>1~50遊戲 - 延緩失智健腦訓練</title>
     
-    <meta property="og:title" content="1到50(阿茲海默專用.訓練遊戲)">
-    <meta property="og:description" content="遊戲設計:陳新昱">
+    <meta property="og:title" content="1~50遊戲 - (陳新昱設計)">
+    <meta property="og:description" content="預防長輩失智的專用腦力訓練遊戲，每日挑戰活化大腦！">
+    <meta property="og:url" content="https://pod0987183520.github.io/1to50/">
+    <meta property="og:image" content="https://pod0987183520.github.io/1to50/z_img_app_512.png?v=5.00">
 
-    <link rel="stylesheet" href="style.css?v=4.11">
-    <link rel="manifest" href="manifest.json">
-
-    <link rel="icon" href="z_img_app_192.png" type="image/png">
-    <link rel="apple-touch-icon" href="z_img_app_192.png">
-    <meta property="og:image" content="https://你的GitHub帳號.github.io/你的專案名稱/z_img_line.png">
+    <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
+    <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
+    <link rel="manifest" href="manifest.json?v=5.00">
+    <link rel="stylesheet" href="style.css?v=5.00">
+    <script>
+        // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
+        (function() {
+            try {
+                var ua = (navigator.userAgent || '').toLowerCase();
+                if (ua.indexOf('line') > -1 && window.location.search.indexOf('openExternalBrowser=1') === -1) {
+                    var sep = window.location.href.indexOf('?') > -1 ? '&' : '?';
+                    window.location.href = window.location.href + sep + 'openExternalBrowser=1';
+                }
+                var isPWA = (window.matchMedia && (
+                                window.matchMedia('(display-mode: standalone)').matches ||
+                                window.matchMedia('(display-mode: fullscreen)').matches ||
+                                window.matchMedia('(display-mode: minimal-ui)').matches
+                            )) ||
+                            window.navigator.standalone === true ||
+                            window.location.search.indexOf('source=pwa') !== -1 ||
+                            (document.referrer && document.referrer.indexOf('android-app://') === 0);
+                if (isPWA) {
+                    document.documentElement.classList.add('is-pwa-standalone');
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 <body>
-    <div class="info-bar" style="width: 100%; max-width: 600px;">
-        <!-- 左側：提示框（標籤 + 超大數字） -->
-        <div id="hintDisplay" class="target-hint">
-            <span class="hint-label">請點選</span>
-            <span id="hintNumber" class="hint-number">1</span>
-        </div>
-        <!-- 右側：計時器 + 歷史按鈕 上下疊排 -->
-        <div class="right-controls">
-            <div id="timerDisplay" class="timer">⏱️ 0.00 秒</div>
-            <button id="historyBtn" class="btn-history">📊</button>
-        </div>
-    </div>
 
-    <div class="game-container">
-        <div id="gameGrid" class="grid"></div>
-    </div>
-
-    <!-- 右下角：難度按鈕 + 計數器並排 -->
-    <div class="bottom-right-bar">
-        <button id="difficultyBtn" class="btn-difficulty">🎯 難度</button>
-        <div class="counter-display">
-            累積遊玩：<span id="totalPlays">0</span> 次<br>
-            玩家總數：<span id="totalVisitors">0</span> 人
-        </div>
-    </div>
-
-    <button id="pwaFixedBtn" class="pwa-btn hidden">📲 加入主畫面</button>
-
-    <div id="androidBanner" class="install-banner hidden">
-        <div class="banner-title">將遊戲加入桌面，隨時隨地玩！</div>
-        <div class="banner-actions">
-            <button id="androidInstallBtn" class="btn-install">立即安裝</button>
-            <button id="androidCloseBtn" class="btn-cancel">稍後再說</button>
-        </div>
-    </div>
-
-    <div id="iosModalB" class="modal-overlay hidden" style="z-index: 10000; align-items: flex-end; padding-bottom: 30px;">
-        <div class="modal-content" style="background: #f0f4f8; border: 2px solid #0f4c81;">
-            <h3 style="color: #0f4c81; margin-bottom: 15px;">🍏 iPhone 加入桌面教學</h3>
-            <div style="text-align: left; line-height: 1.8; font-size: 18px; color: #333;">
-                1. 點擊瀏覽器下方的 <strong style="color:#0f4c81;">「分享」</strong> 圖示<br>
-                2. 往下滑動，點選 <strong style="color:#0f4c81;">「加入主畫面」</strong><br>
-                3. 點擊右上角的 <strong style="color:#0f4c81;">「新增」</strong>
-            </div>
-            <img src="z_img_app_512.png" alt="iOS 加入主畫面教學" style="width: 100%; margin-top: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <button id="iosCloseBtn" class="btn-close" style="margin-top: 20px;">我知道了</button>
-        </div>
-    </div>
-
+    <!-- LINE 內嵌瀏覽器跳出導引彈窗 (防呆圖文教學) -->
     <div id="lineGuideModal" class="guide-modal hidden">
         <div class="line-title">⚠️ 請在瀏覽器中開啟</div>
         <div class="line-steps">
-            為了確保遊戲順暢與記錄保存：<br><br>
-            1. 請點擊右上角的 <strong style="color:#e53e3e;">[⋮]</strong> 或 <strong style="color:#e53e3e;">[≡]</strong><br>
-            2. 選擇 <strong style="color:#e53e3e;">「以其他應用程式開啟」</strong> 或 <strong style="color:#e53e3e;">「在預設瀏覽器中開啟」</strong>
+            為了確保遊戲順暢與紀錄保存：<br><br>
+            1. 請點擊右上角的 <strong style="color:#ef4444;">[⋮]</strong> 或 <strong style="color:#ef4444;">[≡]</strong><br>
+            2. 選擇 <strong style="color:#38bdf8;">「以其他應用程式開啟」</strong> 或 <strong style="color:#38bdf8;">「在預設瀏覽器中開啟」</strong>
         </div>
-        <img src="z_img_line.png" alt="LINE 開啟瀏覽器教學" style="width: 80%; margin: 20px auto; border-radius: 10px;">
-        <button id="lineCloseBtn" class="btn-guide-close">關閉提示</button>
+        <img src="z_img_line.png" alt="LINE 開啟瀏覽器教學" style="width: 80%; max-width: 320px; margin: 20px auto; border-radius: 12px; display: block; border: 2px solid #38bdf8;">
+        <button id="lineCloseBtn" class="btn-guide-close" onclick="document.getElementById('lineGuideModal').classList.add('hidden')">關閉提示</button>
     </div>
+
+    <!-- Android 專屬安裝 App 教學彈窗 -->
+    <div id="androidInstallGuideModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 class="guide-modal-title">🤖 Android 安裝 App 教學</h3>
+            <div class="guide-steps-box">
+                <p>1. 點擊瀏覽器右上角的 <strong>「選單」圖示 ⋮</strong></p>
+                <p>2. 點選 <strong>「安裝應用程式」</strong> 或 <strong>「加到主畫面」 📲</strong></p>
+                <div style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 8px; padding: 10px; margin-top: 12px;">
+                    <p style="font-size: 15px; color: #fef08a; margin: 0; line-height: 1.5;">
+                        💡 <strong>若在 LINE 中開啟：</strong><br>
+                        請點右上角 <strong>「⋮」</strong> ➜ 點選 <strong>「在預設瀏覽器中開啟」</strong>（Chrome），即可一鍵安裝到桌面！
+                    </p>
+                </div>
+            </div>
+            <button class="btn-primary-close" style="margin-top: 18px;" onclick="document.getElementById('androidInstallGuideModal').classList.add('hidden')">我知道了 👍</button>
+        </div>
+    </div>
+
+    <!-- iOS Safari 加入主畫面教學彈窗 -->
+    <div id="iosInstallModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 class="guide-modal-title">🍏 iPhone / iPad 加入桌面教學</h3>
+            <div class="guide-steps-box">
+                <p>1. 點擊瀏覽器最下方的 <strong>「分享」圖示 📤</strong></p>
+                <p>2. 往下滑動，點選 <strong>「加入主畫面」 ➕</strong></p>
+                <p>3. 點擊右上角 <strong>「新增」</strong> 即可在桌面秒開使用！</p>
+            </div>
+            <button class="btn-primary-close" style="margin-top: 18px;" onclick="document.getElementById('iosInstallModal').classList.add('hidden')">我知道了 👍</button>
+        </div>
+    </div>
+
+    <!-- 頂部極簡導覽列 (左側: 代表性 Icon + 1~50遊戲 / 右側: 安裝App按鈕 + 齒輪圖形) -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-brand">
+                <img src="z_img_app_192.png?v=5.00" alt="1~50遊戲" class="header-mini-avatar">
+                <span class="header-brand-title">1~50遊戲</span>
+            </div>
+
+            <!-- 頂端列右側按鈕群：安裝App 按鈕 + 齒輪設定 -->
+            <div class="header-actions">
+                <button id="btn-header-install" class="btn-header-install" title="將 1~50遊戲 安裝至桌面" onclick="triggerPWAInstall()">📲 安裝App</button>
+                <button id="btn-header-gear" class="btn-settings-gear" title="選擇難度設定" onclick="openDifficultyModal()">⚙️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主容器 -->
+    <main class="main-container">
+        
+        <!-- 頂部資訊列：左側提示框 + 右側難度按鈕 + 最右側計時與歷史 -->
+        <div class="info-bar">
+            <!-- 左側群組：[請點選]提示 + 右側緊鄰[難度]按鈕 -->
+            <div class="left-hint-group">
+                <div id="hintDisplay" class="target-hint" title="目前應點選的目標數字">
+                    <span class="hint-label">請點選</span>
+                    <span id="hintNumber" class="hint-number">1</span>
+                </div>
+                
+                <!-- 移至[請點選]提示右側的難度按鈕 -->
+                <button id="difficultyBtn" class="btn-difficulty-inline" onclick="openDifficultyModal()" title="點擊切換遊戲難度">
+                    <span class="diff-btn-icon">🎯</span>
+                    <div class="diff-btn-text-group">
+                        <span class="diff-btn-title">難度</span>
+                        <span id="currentModeLabel" class="diff-btn-val">標準 1~50</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- 右側：計時器 + 歷史戰績按鈕 -->
+            <div class="right-controls">
+                <div id="timerDisplay" class="timer">⏱️ 0.00 秒</div>
+                <button id="historyBtn" class="btn-history" title="查看歷史戰績">📊</button>
+            </div>
+        </div>
+
+        <!-- 5x5 核心遊戲網格 -->
+        <div class="game-container">
+            <div id="gameGrid" class="grid"></div>
+        </div>
+
+        <!-- 底部版權與延緩失智陪伴聲明 (仿照小股同學框架) -->
+        <footer class="app-footer">
+            <div class="footer-design-bar">
+                <span class="footer-design-text">App設計:陳新昱</span>
+                <button type="button" class="btn-footer-suggest" onclick="openFeedbackModal()" title="點擊向陳新昱提供寶貴建議">💡 我想建議</button>
+            </div>
+            <p class="footer-notice">此為延緩失智健腦遊戲，每日練習活化大腦</p>
+            <div class="footer-counters">
+                <span>累積遊玩：<strong id="totalPlays">0</strong> 次</span>
+                <span class="counter-sep">|</span>
+                <span>玩家總數：<strong id="totalVisitors">0</strong> 人</span>
+            </div>
+        </footer>
+
+    </main>
 
     <!-- 難度選擇彈窗 -->
     <div id="difficultyModal" class="modal-overlay">
@@ -99,10 +176,11 @@
                     <div class="diff-desc">7, 14, 21 … 350<br>共需點擊 50 次</div>
                 </div>
             </div>
-            <button id="closeDifficultyBtn" class="btn-close" style="margin-top: 15px;">關閉</button>
+            <button id="closeDifficultyBtn" class="btn-close" style="margin-top: 15px;" onclick="closeDifficultyModal()">關閉</button>
         </div>
     </div>
 
+    <!-- 挑戰完成結算彈窗 -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">🎉 挑戰完成！</div>
@@ -113,6 +191,7 @@
         </div>
     </div>
 
+    <!-- 歷史戰績彈窗 -->
     <div id="historyModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">📊 歷史戰績</div>
@@ -122,13 +201,42 @@
         </div>
     </div>
 
-    <script src="game.js?v=4.11"></script>
+    <!-- 系統設計與開發建議反饋彈窗 (Feedback Modal) -->
+    <div id="feedbackModal" class="modal-overlay hidden">
+        <div class="modal-card feedback-modal-card">
+            <button id="btn-close-feedback-modal" class="btn-modal-close-x" title="關閉視窗" onclick="closeFeedbackModal()">✕</button>
+            <div class="feedback-modal-header">
+                <div class="feedback-avatar-badge">
+                    <span style="font-size: 26px;">💡</span>
+                    <span class="feedback-title-badge">App設計：陳新昱</span>
+                </div>
+            </div>
+            <p class="feedback-subtitle">歡迎留下您寶貴的使用心得或建議，我們將持續用心優化長輩的健腦體驗！</p>
+            <div class="feedback-form">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 16px; font-weight: 800; color:#f8fafc; display:block; margin-bottom:4px; text-align:left;">您的姓名或稱呼：</label>
+                    <input type="text" id="feedback-input-name" class="form-input" placeholder="例如：陳先生 / 小明">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 16px; font-weight: 800; color:#f8fafc; display:block; margin-bottom:4px; text-align:left;">您的聯絡手機：</label>
+                    <input type="tel" id="feedback-input-phone" class="form-input" placeholder="例如：0912345678">
+                </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" style="font-size: 16px; font-weight: 800; color:#f8fafc; display:block; margin-bottom:4px; text-align:left;">建議事項與回饋：</label>
+                    <textarea id="feedback-input-content" class="form-input" rows="4" placeholder="請在此留下您對玩法、字體大小、語音或版面的任何寶貴建議..."></textarea>
+                </div>
+                <button id="btn-submit-feedback" class="btn-primary-save" onclick="submitFeedback()">✉️ 送出建議</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js?v=5.00"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('ServiceWorker 註冊成功！'))
+                navigator.serviceWorker.register('sw.js?v=5.00')
+                    .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
         }
