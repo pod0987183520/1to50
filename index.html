@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.02">
+    <link rel="stylesheet" href="style.css?v=5.03">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -224,12 +224,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.02"></script>
+    <script src="game.js?v=5.03"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.02')
+                navigator.serviceWorker.register('sw.js?v=5.03')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
