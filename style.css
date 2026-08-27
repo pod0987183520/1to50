@@ -200,11 +200,12 @@ body {
 }
 
 .info-column-label {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 900;
-    color: #a7f3d0;
-    letter-spacing: 1px;
+    color: #86efac;
+    letter-spacing: 0.5px;
     line-height: 1;
+    text-shadow: 0 0 8px rgba(134, 239, 172, 0.4);
 }
 
 /* 左側「提醒」提示框 (金黃夜空黑藍底 + 耀眼光暈，與綠色5x5徹底區別，防止誤觸) */

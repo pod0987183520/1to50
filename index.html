@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=5.00" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=5.00">
     <link rel="manifest" href="manifest.json?v=5.00">
-    <link rel="stylesheet" href="style.css?v=5.06">
+    <link rel="stylesheet" href="style.css?v=5.07">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -107,11 +107,11 @@
     <!-- 主容器 -->
     <main class="main-container">
         
-        <!-- 頂部資訊列：左側提醒指示 + 右側難度設定與計時排行榜 -->
+        <!-- 頂部資訊列：左側請點選指示 + 右側難度設定與計時排行榜 -->
         <div class="info-bar">
-            <!-- 左側：上方「提醒」標籤 + 下方目標數字方框 -->
+            <!-- 左側：上方「請點選」標籤 + 下方目標數字方框 -->
             <div class="info-column">
-                <span class="info-column-label">提醒</span>
+                <span class="info-column-label">請點選</span>
                 <div id="hintDisplay" class="target-hint" title="目前應點選的目標數字">
                     <span id="hintNumber" class="hint-number">1</span>
                 </div>
@@ -232,12 +232,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.06"></script>
+    <script src="game.js?v=5.07"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5.06')
+                navigator.serviceWorker.register('sw.js?v=5.07')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
