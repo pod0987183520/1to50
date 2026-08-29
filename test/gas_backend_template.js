@@ -1,10 +1,10 @@
 /**
- * 1~50 遊戲 - Google Apps Script (GAS) 雲端後端程式碼 (v7.01 正式版 - 支援 JSONP 極速直連)
+ * 1~50 遊戲 - Google Apps Script (GAS) 雲端後端程式碼 (v7.02 穩定版)
  * 
  * 包含功能：
  * 1. 【長輩家庭守護】接收爸爸/媽媽遊玩數據 (action: report_play)
- * 2. 【晚輩守護儀表板】查詢指定 Email 家庭的長輩今日遊玩狀態 (action: get_family_status, 支援 callback JSONP)
- * 3. 【網站計數器】累積遊玩次數與玩家總數 (action: count / new_user)
+ * 2. 【晚輩守護儀表板】查詢指定 Email 家庭的長輩今日遊玩狀態 (action: get_family_status)
+ * 3. 【網站計數器】累積遊玩次數與玩家總數 (相容 統計數據 / 工作表1)
  * 4. 【建議反饋】接收使用者提交的心得建議 (action: feedback)
  */
 
@@ -18,13 +18,16 @@ function doPost(e) {
 
 function handleRequest(e) {
   var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
+  try {
+    lock.tryLock(10000);
+  } catch(e) {}
   
+  var params = (e && e.parameter) ? e.parameter : {};
+  var action = params.action || '';
+  var callback = params.callback || '';
+
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var params = (e && e.parameter) ? e.parameter : {};
-    var action = params.action || '';
-    var callback = params.callback || '';
 
     // 輔助：安全將日期物件或字串轉為 yyyy-MM-dd
     function normalizeDateStr(val) {
@@ -42,7 +45,7 @@ function handleRequest(e) {
 
     // 輔助：安全將時間轉為「2026/08/29 (六) 23:24」
     function formatFriendlyTime(val) {
-      if (!val) return '';
+      if (!val) return '尚無紀錄';
       var d = (val instanceof Date) ? val : new Date(val.toString().trim());
       if (isNaN(d.getTime())) return val.toString();
 
@@ -102,7 +105,7 @@ function handleRequest(e) {
         mother: { role: 'mother', name: '媽媽', todayPlays: 0, bestScore: null, lastPlayTime: null, streakDays: 0, historyDates: {} }
       };
 
-      if (sheet) {
+      if (sheet && sheet.getLastRow() > 1) {
         var data = sheet.getDataRange().getValues();
         // 欄位: 0:時間, 1:Email, 2:角色, 3:稱呼, 4:日期, 5:成績, 6:難度
         for (var i = 1; i < data.length; i++) {
@@ -182,11 +185,11 @@ function handleRequest(e) {
     }
 
     // ==========================================
-    // 4. 預設訪客與遊玩次數統計 (相容 統計數據 / 工作表1)
+    // 4. 預設訪客與遊玩次數統計
     // ==========================================
     var countSheet = ss.getSheetByName("統計數據") || ss.getSheetByName("工作表1") || ss.getSheets()[0];
-    var totalPlays = countSheet.getRange(2, 2).getValue() || 0;
-    var totalVisitors = countSheet.getRange(3, 2).getValue() || 0;
+    var totalPlays = parseInt(countSheet.getRange(2, 2).getValue() || 0, 10);
+    var totalVisitors = parseInt(countSheet.getRange(3, 2).getValue() || 0, 10);
 
     if (params.new_user === '1') {
       totalVisitors += 1;
@@ -199,20 +202,21 @@ function handleRequest(e) {
     return createJsonResponse({
       status: 'success',
       totalPlays: totalPlays,
-      totalVisitors: totalVisitors
+      totalVisitors: totalVisitors,
+      plays: totalPlays,
+      visitors: totalVisitors
     }, callback);
 
   } catch (err) {
     return createJsonResponse({ status: 'error', message: err.toString() }, callback);
   } finally {
-    lock.releaseLock();
+    try { lock.releaseLock(); } catch(e) {}
   }
 }
 
 function createJsonResponse(data, callback) {
   var jsonStr = JSON.stringify(data);
   if (callback && callback.trim()) {
-    // JSONP 格式輸出
     return ContentService.createTextOutput(callback.trim() + '(' + jsonStr + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }

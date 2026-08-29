@@ -549,29 +549,45 @@ window.addEventListener('DOMContentLoaded', () => {
         if (lineGuide) lineGuide.classList.remove('hidden');
     }
 
-    // 串接 Google Apps Script 雲端計數器
-    if (!localStorage.getItem('game_1to50_visited_flag')) {
-        localStorage.setItem('game_1to50_visited_flag', 'true');
-        fetch(GAS_API_URL + '?new_user=1')
+    // 串接 Google Apps Script 雲端計數器 (JSONP/Fetch 雙通道)
+    const isNewUser = !localStorage.getItem('game_1to50_visited_flag');
+    if (isNewUser) localStorage.setItem('game_1to50_visited_flag', 'true');
+
+    const counterCbName = 'gasCounterCb_' + Math.floor(Math.random() * 1000000);
+    window[counterCbName] = function(data) {
+        delete window[counterCbName];
+        const oldScript = document.getElementById(counterCbName);
+        if (oldScript) oldScript.remove();
+        updateCounters(data);
+    };
+
+    const counterScript = document.createElement('script');
+    counterScript.id = counterCbName;
+    counterScript.src = `${GAS_API_URL}?${isNewUser ? 'new_user=1&' : ''}callback=${counterCbName}&t=${Date.now()}`;
+    counterScript.onerror = function() {
+        delete window[counterCbName];
+        counterScript.remove();
+        // Fallback: 嘗試標準 fetch
+        fetch(GAS_API_URL + (isNewUser ? '?new_user=1' : ''))
             .then(res => res.json())
             .then(updateCounters)
             .catch(err => console.error('後端計數連線失敗:', err));
-    } else {
-        fetch(GAS_API_URL)
-            .then(res => res.json())
-            .then(updateCounters)
-            .catch(err => console.error('後端計數連線失敗:', err));
-    }
+    };
+    document.body.appendChild(counterScript);
 });
 
 function updateCounters(data) {
-    if (data && data.plays) {
+    if (!data) return;
+    const plays = (data.totalPlays !== undefined) ? data.totalPlays : (data.plays !== undefined ? data.plays : null);
+    const visitors = (data.totalVisitors !== undefined) ? data.totalVisitors : (data.visitors !== undefined ? data.visitors : null);
+
+    if (plays !== null) {
         const el = document.getElementById('totalPlays');
-        if (el) el.innerText = data.plays;
+        if (el) el.innerText = plays;
     }
-    if (data && data.visitors) {
+    if (visitors !== null) {
         const el = document.getElementById('totalVisitors');
-        if (el) el.innerText = data.visitors;
+        if (el) el.innerText = visitors;
     }
 }
 
@@ -769,11 +785,36 @@ window.fetchFamilyStatus = function fetchFamilyStatus(isManual) {
     script.src = `${GAS_API_URL}?action=get_family_status&email=${encodeURIComponent(config.email)}&callback=${callbackName}&t=${Date.now()}`;
     script.onerror = function() {
         if (isCompleted) return;
-        isCompleted = true;
-        clearTimeout(timer);
-        delete window[callbackName];
-        script.remove();
-        container.innerHTML = `<div class="family-loading" style="color:#f87171;">⚠️ 雲端連線失敗，請檢查網路或稍後重試</div>`;
+        // 備援通道：嘗試 Fetch
+        fetch(`${GAS_API_URL}?action=get_family_status&email=${encodeURIComponent(config.email)}&t=${Date.now()}`)
+            .then(res => res.json())
+            .then(data => {
+                if (isCompleted) return;
+                isCompleted = true;
+                clearTimeout(timer);
+                delete window[callbackName];
+                script.remove();
+                if (data && data.status === 'success' && Array.isArray(data.elders)) {
+                    renderEldersCards(data.elders);
+                } else {
+                    renderEldersCards([
+                        { role: 'father', name: '爸爸', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 },
+                        { role: 'mother', name: '媽媽', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 }
+                    ]);
+                }
+            })
+            .catch(() => {
+                if (isCompleted) return;
+                isCompleted = true;
+                clearTimeout(timer);
+                delete window[callbackName];
+                script.remove();
+                // 容錯優雅降級：仍呈現爸爸/媽媽基礎卡片
+                renderEldersCards([
+                    { role: 'father', name: '爸爸', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 },
+                    { role: 'mother', name: '媽媽', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 }
+                ]);
+            });
     };
     document.body.appendChild(script);
 };
