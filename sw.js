@@ -1,12 +1,12 @@
-const CACHE_NAME = '1to50-pwa-cache-v6.00';
+const CACHE_NAME = '1to50-pwa-cache-v7.00';
 
 const ASSETS_TO_CACHE = [
   'index.html',
-  'style.css?v=6.00',
-  'game.js?v=6.00',
-  'manifest.json?v=6.00',
-  'z_img_app_192.png?v=6.00',
-  'z_img_app_512.png?v=6.00',
+  'style.css?v=7.00',
+  'game.js?v=7.00',
+  'manifest.json?v=7.00',
+  'z_img_app_192.png?v=7.00',
+  'z_img_app_512.png?v=7.00',
   'z_img_line.png'
 ];
 
