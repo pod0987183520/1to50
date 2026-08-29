@@ -1,12 +1,12 @@
-const CACHE_NAME = '1to50-pwa-cache-v7.01';
+const CACHE_NAME = '1to50-pwa-cache-v7.04';
 
 const ASSETS_TO_CACHE = [
   'index.html',
-  'style.css?v=7.01',
-  'game.js?v=7.01',
-  'manifest.json?v=7.01',
-  'z_img_app_192.png?v=7.01',
-  'z_img_app_512.png?v=7.01',
+  'style.css?v=7.04',
+  'game.js?v=7.04',
+  'manifest.json?v=7.04',
+  'z_img_app_192.png?v=7.04',
+  'z_img_app_512.png?v=7.04',
   'z_img_line.png'
 ];
 
@@ -34,14 +34,22 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 【核心策略：網路優先策略 Network-First】
+// 【核心策略：網路優先策略 Network-First，嚴格排除後端 API】
 self.addEventListener('fetch', (event) => {
-  if (!event.request.url.startsWith('http')) return;
+  const url = event.request.url;
+  
+  // 嚴格排除 Google Apps Script API 與外部跨域請求，絕不攔截或重發
+  if (url.includes('script.google.com') || 
+      url.includes('googleusercontent.com') || 
+      url.includes('googleapis.com') ||
+      !url.startsWith(self.location.origin)) {
+    return; // 直接交由瀏覽器原生網路處理
+  }
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.status === 200) {
+        if (response && response.status === 200) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);

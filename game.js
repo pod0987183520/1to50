@@ -184,10 +184,13 @@ function saveScoreToLocal(score, timestamp) {
     localStorage.setItem(getHistoryKey(), JSON.stringify(history));
 }
 
+let currentRoundReported = false; // 每局防重複回報鎖
+
 // ==========================================
 // 3. 遊戲核心運行邏輯
 // ==========================================
 function initGame() {
+    currentRoundReported = false; // 開新局重置回報鎖
     const step = MODES[currentMode].step;
     currentTarget = step * 1;
     gameActive = false;
@@ -290,8 +293,11 @@ function endGame() {
     DOM.resultModal.classList.remove('hidden');
     saveScoreToLocal(finalTime, nowTimestamp);
 
-    // 長輩機自動雲端同步 (爸爸/媽媽遊玩紀錄回報)
-    reportElderPlayToCloud(finalTime, MODES[currentMode].label);
+    // 長輩機自動雲端同步 (每局嚴格只回報 1 次，防止停在結算頁重複送出)
+    if (!currentRoundReported) {
+        currentRoundReported = true;
+        reportElderPlayToCloud(finalTime, MODES[currentMode].label);
+    }
 }
 
 // ==========================================
@@ -925,13 +931,14 @@ window.sendLineCare = function sendLineCare(role, name, todayPlays, bestScore) {
     }
 };
 
-// 長輩完成遊戲時，背景自動同步給 GAS 雲端
+// 長輩完成遊戲時，背景自動同步給 GAS 雲端 (單次發送防重複)
 function reportElderPlayToCloud(score, modeLabel) {
     const config = getFamilyConfig();
     if (!config || (config.role !== 'father' && config.role !== 'mother')) {
         return; // 非長輩機或未綁定，不需回報
     }
 
+    const roundId = 'rnd_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const payload = {
         action: 'report_play',
         email: config.email,
@@ -939,15 +946,15 @@ function reportElderPlayToCloud(score, modeLabel) {
         name: config.name,
         score: score,
         mode: modeLabel,
-        timestamp: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hour12: false })
+        round_id: roundId,
+        t: Date.now()
     };
 
     const query = Object.keys(payload)
         .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(payload[k])}`)
         .join('&');
 
-    // 背景靜默送出，不干擾長輩遊戲體驗
-    fetch(`${GAS_API_URL}?${query}`, { mode: 'no-cors' })
-        .then(() => console.log('長輩遊玩數據已同步至雲端'))
-        .catch(err => console.error('長輩數據同步失敗:', err));
+    // 使用 Image Beacon 送出，零阻塞、不重試、單次送出
+    const beacon = new Image();
+    beacon.src = `${GAS_API_URL}?${query}`;
 }
