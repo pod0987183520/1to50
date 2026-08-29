@@ -1,21 +1,11 @@
 /**
- * 1~50 遊戲 - Google Apps Script (GAS) 雲端後端程式碼
+ * 1~50 遊戲 - Google Apps Script (GAS) 雲端後端程式碼 (v7.00 正式版)
  * 
  * 包含功能：
  * 1. 【長輩家庭守護】接收爸爸/媽媽遊玩數據 (action: report_play)
  * 2. 【晚輩守護儀表板】查詢指定 Email 家庭的長輩今日遊玩狀態 (action: get_family_status)
  * 3. 【網站計數器】累積遊玩次數與玩家總數 (action: count / new_user)
  * 4. 【建議反饋】接收使用者提交的心得建議 (action: feedback)
- * 
- * 部署步驟：
- * 1. 建立一個新的 Google Sheet (Google 試算表)
- * 2. 點擊頂端選單「擴充功能」 -> 「Apps Script」
- * 3. 將本檔案內容完整貼入 Code.gs 中
- * 4. 點擊右上角「部署」 -> 「新增部署」 -> 齒輪選擇「網頁應用程式」
- * 5. 設定：
- *    - 執行身分：我 (您的帳號)
- *    - 誰可以存取：所有人 (Anyone)
- * 6. 點擊部署，複製取得的「網頁應用程式網址 (Web App URL)」，貼回 game.js 中的 GAS_API_URL 即可！
  */
 
 function doGet(e) {
@@ -35,6 +25,36 @@ function handleRequest(e) {
     var params = (e && e.parameter) ? e.parameter : {};
     var action = params.action || '';
 
+    // 輔助：安全將日期物件或字串轉為 yyyy-MM-dd
+    function normalizeDateStr(val) {
+      if (!val) return '';
+      if (val instanceof Date) {
+        return Utilities.formatDate(val, "Asia/Taipei", "yyyy-MM-dd");
+      }
+      var s = val.toString().trim();
+      var parsed = new Date(s);
+      if (!isNaN(parsed.getTime())) {
+        return Utilities.formatDate(parsed, "Asia/Taipei", "yyyy-MM-dd");
+      }
+      return s.substring(0, 10);
+    }
+
+    // 輔助：安全將時間轉為「2026/08/29 (六) 23:24」
+    function formatFriendlyTime(val) {
+      if (!val) return '';
+      var d = (val instanceof Date) ? val : new Date(val.toString().trim());
+      if (isNaN(d.getTime())) return val.toString();
+
+      var weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+      var yyyy = Utilities.formatDate(d, "Asia/Taipei", "yyyy");
+      var mm = Utilities.formatDate(d, "Asia/Taipei", "MM");
+      var dd = Utilities.formatDate(d, "Asia/Taipei", "dd");
+      var w = weekdays[parseInt(Utilities.formatDate(d, "Asia/Taipei", "u"), 10) % 7];
+      var hhmm = Utilities.formatDate(d, "Asia/Taipei", "HH:mm");
+
+      return yyyy + "/" + mm + "/" + dd + " (" + w + ") " + hhmm;
+    }
+
     // ==========================================
     // 1. 長輩遊玩數據回報 (action: report_play)
     // ==========================================
@@ -44,8 +64,9 @@ function handleRequest(e) {
       var name = (params.name || '').trim(); // '爸爸' 或 '媽媽'
       var score = parseFloat(params.score || 0);
       var mode = params.mode || '標準模式';
-      var timeStr = params.timestamp || Utilities.formatDate(new Date(), "Asia/Taipei", "yyyy-MM-dd HH:mm:ss");
-      var dateStr = Utilities.formatDate(new Date(), "Asia/Taipei", "yyyy-MM-dd");
+      var nowDate = new Date();
+      var timeStr = Utilities.formatDate(nowDate, "Asia/Taipei", "yyyy/MM/dd HH:mm:ss");
+      var dateStr = Utilities.formatDate(nowDate, "Asia/Taipei", "yyyy-MM-dd");
 
       if (!email || !role) {
         return createJsonResponse({ status: 'error', message: '缺少 Email 或角色資訊' });
@@ -86,22 +107,27 @@ function handleRequest(e) {
         for (var i = 1; i < data.length; i++) {
           var rowEmail = (data[i][1] || '').toString().trim().toLowerCase();
           var rowRole = (data[i][2] || '').toString().trim();
-          var rowTime = (data[i][0] || '').toString().trim();
-          var rowDate = (data[i][4] || '').toString().trim();
+          var rawTime = data[i][0];
+          var rawDate = data[i][4];
+          var rowDate = normalizeDateStr(rawDate);
           var rowScore = parseFloat(data[i][5] || 0);
 
           if (rowEmail === searchEmail && (rowRole === 'father' || rowRole === 'mother')) {
             var elder = eldersData[rowRole];
+            var friendlyTime = formatFriendlyTime(rawTime);
+
             if (rowDate === todayStr) {
               elder.todayPlays += 1;
               if (elder.bestScore === null || (rowScore > 0 && rowScore < elder.bestScore)) {
                 elder.bestScore = rowScore;
               }
-              elder.lastPlayTime = rowTime;
+              elder.lastPlayTime = friendlyTime;
             } else if (!elder.lastPlayTime) {
-              elder.lastPlayTime = rowTime;
+              elder.lastPlayTime = friendlyTime;
             }
-            elder.historyDates[rowDate] = true;
+            if (rowDate) {
+              elder.historyDates[rowDate] = true;
+            }
           }
         }
       }
@@ -155,16 +181,9 @@ function handleRequest(e) {
     }
 
     // ==========================================
-    // 4. 預設訪客與遊玩次數統計
+    // 4. 預設訪客與遊玩次數統計 (相容 統計數據 / 工作表1)
     // ==========================================
-    var countSheet = ss.getSheetByName("統計數據");
-    if (!countSheet) {
-      countSheet = ss.insertSheet("統計數據");
-      countSheet.appendRow(["項目", "數值"]);
-      countSheet.appendRow(["遊玩總次數", 0]);
-      countSheet.appendRow(["玩家總人數", 0]);
-    }
-    
+    var countSheet = ss.getSheetByName("統計數據") || ss.getSheetByName("工作表1") || ss.getSheets()[0];
     var totalPlays = countSheet.getRange(2, 2).getValue() || 0;
     var totalVisitors = countSheet.getRange(3, 2).getValue() || 0;
 

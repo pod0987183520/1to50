@@ -786,8 +786,29 @@ function renderEldersCards(elders) {
             ? `<span class="elder-status-badge badge-success">🟢 今日已動腦 (${elder.todayPlays}次)</span>`
             : `<span class="elder-status-badge badge-warning">🔴 今日尚未遊玩</span>`;
 
-        const bestScoreStr = elder.bestScore ? `${parseFloat(elder.bestScore).toFixed(2)} 秒` : '尚未挑戰';
-        const lastPlayStr = elder.lastPlayTime ? elder.lastPlayTime : '尚無紀錄';
+        // 安全格式化時間為「2026/08/29 (六) 23:24」
+        let lastPlayStr = '尚無紀錄';
+        if (elder.lastPlayTime && elder.lastPlayTime !== '尚無紀錄') {
+            const raw = elder.lastPlayTime.toString();
+            // 如果已經是中文字串格式 (2026/08/29 (六) 23:24) 直接使用
+            if (raw.includes('(') && raw.includes(')')) {
+                lastPlayStr = raw;
+            } else {
+                const parsed = new Date(raw);
+                if (!isNaN(parsed.getTime())) {
+                    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                    const yyyy = parsed.getFullYear();
+                    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+                    const dd = String(parsed.getDate()).padStart(2, '0');
+                    const w = weekdays[parsed.getDay()];
+                    const hh = String(parsed.getHours()).padStart(2, '0');
+                    const min = String(parsed.getMinutes()).padStart(2, '0');
+                    lastPlayStr = `${yyyy}/${mm}/${dd} (${w}) ${hh}:${min}`;
+                } else {
+                    lastPlayStr = raw;
+                }
+            }
+        }
         const streakStr = elder.streakDays > 0 ? `連續 ${elder.streakDays} 天 🔥` : '今日待開局';
 
         html += `
