@@ -1,0 +1,1270 @@
+/* ==========================================================================
+   1~50 延緩失智健腦訓練遊戲 - 長者無障礙高對比設計系統 (WCAG 2.1 AAA 標準)
+   ========================================================================== */
+
+:root {
+    /* 基礎配色：深邃翡翠森林綠 (沈穩護眼) */
+    --bg-primary:    #0a1710;
+    --bg-card:       #132e1c;
+    --bg-card-hover: #1c452a;
+    --text-primary:  #ffffff;
+    --text-secondary:#c8e6c9;
+    --text-muted:    #81c784;
+    
+    /* 強烈對比與情緒色系 */
+    --color-gold:    #ffcc02;   /* 亮眼金黃 */
+    --color-accent:  #38bdf8;   /* 晴空藍 */
+    --color-emerald: #10b981;   /* 活水翠綠 */
+    --color-wrong:   #ef4444;   /* 警告赤紅 */
+    
+    /* 格子專屬配色 (翠綠方塊) */
+    --grid-bg:       #1b5e35;
+    --grid-hover:    #2e7d4f;
+    --grid-text:     #ffffff;
+    
+    /* 字級階梯規範 (長者友善) */
+    --font-base:     20px;
+    --radius-sm:     8px;
+    --radius-md:     14px;
+    --radius-lg:     22px;
+    --radius-full:   9999px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    height: 100%;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    touch-action: manipulation;
+}
+
+/* 全域隱藏規則 (權重最高) */
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   1. 頂部極簡導覽列 (下方留有舒適微間距)
+   ========================================== */
+.app-header {
+    width: 100%;
+    background: rgba(10, 23, 16, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 12px;
+    flex-shrink: 0;
+    z-index: 50;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+    margin-bottom: 4px;
+}
+
+.header-content {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-mini-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 50%;
+    border: 2px solid #ffcc02;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 0 10px rgba(255, 204, 2, 0.4);
+}
+
+.header-brand-title {
+    font-size: 21px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 頂端列 安裝App 按鈕 (常駐明顯顯示) */
+.btn-header-install {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 1.5px solid #34d399;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 5px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+
+.btn-header-install:active {
+    transform: scale(0.93);
+    background: #047857;
+}
+
+/* PWA 獨立 App 模式 (已安裝開啟或由主畫面開啟時，自動隱藏頂端列「📲 安裝App」) */
+.is-pwa-standalone #btn-header-install,
+html.is-pwa-standalone #btn-header-install {
+    display: none !important;
+}
+
+@media all and (display-mode: standalone) {
+    #btn-header-install {
+        display: none !important;
+    }
+}
+
+@media all and (display-mode: fullscreen) {
+    #btn-header-install {
+        display: none !important;
+    }
+}
+
+@media all and (display-mode: minimal-ui) {
+    #btn-header-install {
+        display: none !important;
+    }
+}
+
+.btn-settings-gear {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    color: #cbd5e1;
+    font-size: 19px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.15s ease;
+}
+
+.btn-settings-gear:active {
+    transform: scale(0.92);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* ==========================================
+   2. 主容器 (Y軸置中於畫面、元素緊湊相依)
+   ========================================== */
+.main-container {
+    flex: 1;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2px 8px 6px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 讓整體內容於畫面上 Y 軸置中 */
+    gap: 8px;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+/* 頂部資訊列：左側提醒 / 右側(難度+計時+排行榜) */
+.info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 2px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+/* 頂部欄位垂直組合 (標籤在上方 + 方框在下方) */
+.info-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.info-column-label {
+    font-size: clamp(18px, 5vw, 22px);
+    font-weight: 900;
+    color: #86efac;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(134, 239, 172, 0.45);
+}
+
+/* 左側「提醒」提示框 (金黃夜空黑藍底 + 耀眼光暈，與綠色5x5徹底區別，防止誤觸) */
+.target-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0b1329;
+    border: 2.5px solid #ffcc02;
+    border-radius: 14px;
+    width: 66px;
+    height: 66px;
+    min-width: 66px;
+    min-height: 66px;
+    box-shadow: 0 0 16px rgba(255, 204, 2, 0.35), inset 0 2px 6px rgba(0, 0, 0, 0.7);
+    box-sizing: border-box;
+}
+
+.hint-number {
+    font-size: clamp(34px, 10vmin, 44px);
+    font-weight: 900;
+    color: #ffcc02;
+    line-height: 1;
+    text-shadow: 0 0 14px rgba(255, 204, 2, 0.8), 0 0 26px rgba(255, 204, 2, 0.4);
+}
+
+.hint-number.three-digit {
+    font-size: clamp(22px, 7vmin, 30px);
+}
+
+/* 右側群組 (靠右對齊)：正方形難度按鈕 + 排行榜與計時 */
+.right-controls-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+/* 右側「🎯 難度」按鈕 (晴空晶藍漸層 + 放大靶心，與綠色5x5徹底區別) */
+.btn-difficulty-square {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border: 2.5px solid #38bdf8;
+    border-radius: 14px;
+    width: 66px;
+    height: 66px;
+    min-width: 66px;
+    min-height: 66px;
+    cursor: pointer;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.35), 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.btn-difficulty-square:active {
+    transform: scale(0.92);
+    background: #075985;
+}
+
+.diff-square-icon {
+    font-size: 34px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+}
+
+/* 右側：計時器 + 歷史戰績(排行榜)按鈕 */
+.right-timer-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 87px; /* 完美契合標籤+方框的總高度 */
+    padding: 1px 0;
+    box-sizing: border-box;
+}
+
+.timer {
+    color: #81c784;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(15px, 3.8vw, 18px);
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(129, 199, 132, 0.35);
+}
+
+.btn-history {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    color: white;
+    border: 2px solid #2dd4bf;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), 0 0 10px rgba(45, 212, 191, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease;
+}
+
+.btn-history:active {
+    transform: scale(0.9);
+}
+
+/* ==========================================
+   3. 5x5 遊戲主網格 (自適應螢幕大小，緊湊相依)
+   ========================================== */
+.game-container {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.grid {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    max-width: min(94vw, calc(100dvh - 240px), 430px);
+    max-height: min(94vw, calc(100dvh - 240px), 430px);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+    touch-action: none;
+}
+
+.grid-cell {
+    background-color: var(--grid-bg);
+    color: var(--grid-text);
+    font-size: clamp(26px, 9.5vmin, 48px);
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: transform 0.05s, background-color 0.1s;
+    touch-action: none;
+    padding: 2px;
+    line-height: 1;
+    overflow: hidden;
+}
+
+.grid-cell:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.grid-cell.wrong {
+    background-color: var(--color-wrong) !important;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.grid-cell.three-digit {
+    font-size: clamp(19px, 7vmin, 36px);
+}
+
+/* ==========================================
+   3.5 雙分隔線 (5x5 上方與下方各兩行分隔線)
+   ========================================== */
+.divider-double {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 2px auto;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.divider-line {
+    width: 100%;
+    height: 1.5px;
+    background: linear-gradient(90deg, rgba(74, 222, 128, 0.08) 0%, rgba(74, 222, 128, 0.45) 50%, rgba(74, 222, 128, 0.08) 100%);
+    border-radius: 1px;
+}
+
+/* ==========================================
+   4. 底部版權與陪伴聲明 (安全防誤觸行距、三行等大字級)
+   ========================================== */
+.app-footer {
+    width: 100%;
+    max-width: 480px;
+    margin: 6px auto 0 auto; /* 安全防誤觸間距 */
+    padding: 2px 2px 2px 2px;
+    text-align: center;
+    border-top: none; /* 由雙分隔線統一取代 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+/* 最後一行：App設計:陳新昱 與 我想建議 緊靠置中 (位於最底端防止誤觸，字級調大) */
+.footer-design-bar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 3px;
+    margin-bottom: 0;
+    flex-wrap: nowrap;
+}
+
+.footer-design-text {
+    font-size: clamp(18px, 5vw, 21px);
+    font-weight: 900;
+    color: #fef08a;
+    text-shadow: 0 0 10px rgba(254, 240, 138, 0.4);
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+
+.btn-footer-suggest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    font-size: clamp(15px, 4.2vw, 18px);
+    font-weight: 900;
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 1.5px solid #38bdf8;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition: all 0.15s ease;
+}
+
+.btn-footer-suggest:active {
+    transform: scale(0.95);
+    background: #075985;
+}
+
+/* 第一行：陪伴聲明 */
+.footer-notice {
+    font-size: clamp(14px, 4vw, 17px);
+    font-weight: 800;
+    color: #cbd5e1;
+    line-height: 1.3;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* 第二行：計數器 (字級調大一級) */
+.footer-counters {
+    font-size: clamp(16px, 4.5vw, 19px);
+    color: #a5d6a7;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.footer-counters strong {
+    color: #80cbc4;
+    font-size: clamp(16px, 4.5vw, 19px);
+    font-weight: 900;
+}
+
+.counter-sep {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* ==========================================
+   5. 彈窗系統 (長者友善大字高對比)
+   ========================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    z-index: 1000;
+}
+
+.modal-content,
+.modal-card {
+    background-color: #132e1c;
+    border: 2px solid #2e7d32;
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    position: relative;
+    animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-title {
+    font-size: 26px;
+    color: #4ade80;
+    margin-bottom: 12px;
+    font-weight: 900;
+}
+
+.modal-score {
+    font-size: 26px;
+    font-weight: 900;
+    color: #fb923c;
+    margin-bottom: 10px;
+}
+
+.modal-rank {
+    font-size: 18px;
+    font-weight: bold;
+    color: #80cbc4;
+    margin: 12px 0;
+    text-align: left;
+}
+
+.modal-praise {
+    font-size: 20px;
+    font-weight: 800;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    padding: 10px;
+    background-color: #0b1f13;
+    border-radius: 12px;
+    border: 1px solid #2e7d32;
+}
+
+.history-subtitle {
+    color: #81c784;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.history-list {
+    text-align: left;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 12px 0;
+    padding: 6px;
+    border: 1px solid #2e7d32;
+    border-radius: 10px;
+    background: #0b1f13;
+}
+
+.btn-restart, .btn-close, .btn-primary-close, .btn-primary-save {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    font-size: 20px;
+    font-weight: 900;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #047857;
+    transition: all 0.1s ease;
+    width: 100%;
+}
+
+.btn-restart:active, .btn-close:active, .btn-primary-close:active, .btn-primary-save:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #047857;
+}
+
+.btn-close {
+    background: #37474f;
+    box-shadow: 0 4px 0 #263238;
+    margin-top: 10px;
+    font-size: 18px;
+    padding: 10px;
+}
+
+.btn-modal-close-x {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    font-size: 18px;
+    font-weight: 900;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-modal-close-x:active {
+    transform: scale(0.9);
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* 難度選擇清單 */
+.difficulty-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.difficulty-option {
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 2px solid #2e7d32;
+    background: #0b1f13;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+.difficulty-option:hover {
+    border-color: #4ade80;
+    background: #143520;
+}
+
+.difficulty-option.active {
+    border-color: #ffcc02;
+    background: linear-gradient(135deg, #184227 0%, #12331e 100%);
+    box-shadow: 0 0 12px rgba(255, 204, 2, 0.3);
+}
+
+.diff-label {
+    font-size: 20px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.difficulty-option.active .diff-label {
+    color: #ffcc02;
+}
+
+.diff-desc {
+    font-size: 14px;
+    color: #a5d6a7;
+    line-height: 1.4;
+}
+
+/* 反饋彈窗專屬樣式 */
+.feedback-modal-card {
+    background: #0b1f13;
+    border: 3px solid #fef08a;
+    box-shadow: 0 0 35px rgba(254, 240, 138, 0.3);
+}
+
+.feedback-modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.feedback-avatar-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feedback-title-badge {
+    font-size: 20px;
+    font-weight: 900;
+    color: #fef08a;
+}
+
+.feedback-subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #94a3b8;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.form-input {
+    width: 100%;
+    background: #132e1c;
+    border: 1.5px solid #2e7d32;
+    border-radius: 10px;
+    color: #ffffff;
+    padding: 8px 12px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+}
+
+.form-input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+/* LINE 專屬跳脫導引彈窗 */
+.guide-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 23, 16, 0.96);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    color: #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.line-title {
+    color: #fbbf24;
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 16px;
+    text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+}
+
+.line-steps {
+    font-size: 18px;
+    line-height: 1.7;
+    text-align: left;
+    background: #132e1c;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 2px dashed #38bdf8;
+    color: #f8fafc;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.btn-guide-close {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 12px 36px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 900;
+    margin-top: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    transition: transform 0.15s ease;
+}
+
+.btn-guide-close:active {
+    transform: scale(0.95);
+}
+
+/* iOS/Android 教學彈窗樣式 */
+.guide-modal-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #38bdf8;
+    margin-bottom: 12px;
+}
+
+.guide-steps-box {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #f1f5f9;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-align: left;
+}
+
+/* ==========================================
+   6. 家庭守護與長輩動態儀表板樣式 (v6.10)
+   ========================================== */
+.settings-modal-content {
+    max-width: 480px;
+    padding: 20px 16px 16px 16px;
+}
+
+/* 分頁切換 (Tabs) */
+.modal-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: #0b1f13;
+    padding: 4px;
+    border-radius: 14px;
+    border: 1px solid #2e7d32;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 17px;
+    font-weight: 900;
+    color: #a5d6a7;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: #2e7d32;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.5);
+}
+
+.tab-content-panel {
+    width: 100%;
+}
+
+/* 家庭表單視圖 */
+.family-form-box {
+    text-align: left;
+    background: #0b1f13;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid #2e7d32;
+}
+
+.form-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.form-title-text {
+    font-size: 19px;
+    font-weight: 900;
+    color: #4ade80;
+}
+
+.form-tips {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.form-item {
+    margin-bottom: 16px;
+}
+
+.form-label-lg {
+    font-size: 15px;
+    font-weight: 800;
+    color: #f8fafc;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.form-input-lg {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 2px solid #2e7d32;
+    background: #132e1c;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.form-input-lg:focus {
+    border-color: #4ade80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+/* 角色單選卡片網格 (爸爸 / 媽媽 / 晚輩) */
+.role-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.role-option-card {
+    cursor: pointer;
+    display: block;
+}
+
+.role-option-card input[type="radio"] {
+    display: none;
+}
+
+.role-card-body {
+    background: #132e1c;
+    border: 2px solid #2e7d32;
+    border-radius: 12px;
+    padding: 12px 4px;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.role-emoji {
+    font-size: 28px;
+    margin-bottom: 2px;
+}
+
+.role-name {
+    font-size: 17px;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.role-sub {
+    font-size: 11px;
+    color: #81c784;
+}
+
+.role-option-card input[type="radio"]:checked + .role-card-body {
+    border-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    transform: translateY(-2px);
+}
+
+.role-option-card input[type="radio"]:checked + .role-card-body .role-name {
+    color: #38bdf8;
+}
+
+/* 按鈕群組 */
+.form-btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.btn-save-family {
+    flex: 1;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 17px;
+    font-weight: 900;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-save-family:active {
+    transform: scale(0.97);
+}
+
+.btn-cancel-family {
+    background: rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* 長輩機綁定卡片 */
+.elder-status-card {
+    background: #0b1f13;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #2e7d32;
+    text-align: center;
+}
+
+.elder-avatar {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.elder-role-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #4ade80;
+    margin-bottom: 8px;
+}
+
+.elder-desc {
+    font-size: 15px;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.elder-email-info {
+    font-size: 14px;
+    color: #81c784;
+    background: #132e1c;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    word-break: break-all;
+}
+
+.btn-modify-binding {
+    background: transparent;
+    border: 1px dashed #81c784;
+    color: #a5d6a7;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* 晚輩守護儀表板視圖 */
+.family-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    background: #0b1f13;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #2e7d32;
+}
+
+.family-email-badge {
+    font-size: 14px;
+    font-weight: 800;
+    color: #38bdf8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 280px;
+}
+
+.btn-sm-edit {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border: 1px solid #2e7d32;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 長輩動態卡片列表 */
+.elders-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.family-loading {
+    font-size: 16px;
+    color: #a5d6a7;
+    padding: 24px 0;
+    text-align: center;
+}
+
+/* 長輩動態單卡 */
+.elder-dash-card {
+    background: #0b1f13;
+    border: 2px solid #2e7d32;
+    border-radius: 16px;
+    padding: 14px;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.elder-dash-card.card-active {
+    border-color: #4ade80;
+}
+
+.elder-dash-card.card-warning {
+    border-color: #f59e0b;
+}
+
+.elder-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.elder-name-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.elder-name-emoji {
+    font-size: 24px;
+}
+
+.elder-name-text {
+    font-size: 19px;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.elder-status-badge {
+    font-size: 13px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid #22c55e;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid #f59e0b;
+}
+
+.elder-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #132e1c;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.stat-box-item {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.stat-box-val {
+    font-size: 16px;
+    font-weight: 900;
+    color: #f8fafc;
+    margin-top: 2px;
+}
+
+.stat-box-val.highlight {
+    color: #38bdf8;
+}
+
+.elder-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-line-care {
+    flex: 1;
+    background: #06c755;
+    color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 900;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(6, 199, 85, 0.4);
+}
+
+.btn-line-care:active {
+    transform: scale(0.97);
+}
+
+.dash-actions-bar {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-refresh-dash {
+    flex: 2;
+    background: #2e7d32;
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn-test-sim {
+    flex: 1;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px dashed #f59e0b;
+    color: #fef08a;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 10px;
+    cursor: pointer;
+}

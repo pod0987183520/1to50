@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a1710">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>1~50遊戲 (測試版) - 延緩失智健腦訓練</title>
+    
+    <meta property="og:title" content="1~50遊戲 (測試版) - (陳新昱設計)">
+    <meta property="og:description" content="預防長輩失智的專用腦力訓練遊戲，每日挑戰活化大腦！">
+    <meta property="og:url" content="https://pod0987183520.github.io/1to50/test/">
+    <meta property="og:image" content="https://pod0987183520.github.io/1to50/test/z_img_app_512.png?v=6.10">
+
+    <link rel="icon" href="z_img_app_192.png?v=6.10" type="image/png">
+    <link rel="apple-touch-icon" href="z_img_app_192.png?v=6.10">
+    <link rel="manifest" href="manifest.json?v=6.10">
+    <link rel="stylesheet" href="style.css?v=6.10">
+    <script>
+        // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
+        (function() {
+            try {
+                var ua = (navigator.userAgent || '').toLowerCase();
+                if (ua.indexOf('line') > -1 && window.location.search.indexOf('openExternalBrowser=1') === -1) {
+                    var sep = window.location.href.indexOf('?') > -1 ? '&' : '?';
+                    window.location.href = window.location.href + sep + 'openExternalBrowser=1';
+                }
+                var isPWA = (window.matchMedia && (
+                                window.matchMedia('(display-mode: standalone)').matches ||
+                                window.matchMedia('(display-mode: fullscreen)').matches ||
+                                window.matchMedia('(display-mode: minimal-ui)').matches
+                            )) ||
+                            window.navigator.standalone === true ||
+                            window.location.search.indexOf('source=pwa') !== -1 ||
+                            (document.referrer && document.referrer.indexOf('android-app://') === 0) ||
+                            localStorage.getItem('1to50_pwa_installed') === 'true';
+                if (isPWA) {
+                    document.documentElement.classList.add('is-pwa-standalone');
+                }
+            } catch(e) {}
+        })();
+    </script>
+</head>
+<body>
+
+    <!-- LINE 內嵌瀏覽器跳出導引彈窗 (防呆圖文教學) -->
+    <div id="lineGuideModal" class="guide-modal hidden">
+        <div class="line-title">⚠️ 請在瀏覽器中開啟</div>
+        <div class="line-steps">
+            為了確保遊戲順暢與紀錄保存：<br><br>
+            1. 請點擊右上角的 <strong style="color:#ef4444;">[⋮]</strong> 或 <strong style="color:#ef4444;">[≡]</strong><br>
+            2. 選擇 <strong style="color:#38bdf8;">「以其他應用程式開啟」</strong> 或 <strong style="color:#38bdf8;">「在預設瀏覽器中開啟」</strong>
+        </div>
+        <img src="z_img_line.png" alt="LINE 開啟瀏覽器教學" style="width: 80%; max-width: 320px; margin: 20px auto; border-radius: 12px; display: block; border: 2px solid #38bdf8;">
+        <button id="lineCloseBtn" class="btn-guide-close" onclick="document.getElementById('lineGuideModal').classList.add('hidden')">關閉提示</button>
+    </div>
+
+    <!-- Android 專屬安裝 App 教學彈窗 -->
+    <div id="androidInstallGuideModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 class="guide-modal-title">🤖 Android 安裝 App 教學</h3>
+            <div class="guide-steps-box">
+                <p>1. 點擊瀏覽器右上角的 <strong>「選單」圖示 ⋮</strong></p>
+                <p>2. 點選 <strong>「安裝應用程式」</strong> 或 <strong>「加到主畫面」 📲</strong></p>
+                <div style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 8px; padding: 10px; margin-top: 12px;">
+                    <p style="font-size: 15px; color: #fef08a; margin: 0; line-height: 1.5;">
+                        💡 <strong>若在 LINE 中開啟：</strong><br>
+                        請點右上角 <strong>「⋮」</strong> ➜ 點選 <strong>「在預設瀏覽器中開啟」</strong>（Chrome），即可一鍵安裝到桌面！
+                    </p>
+                </div>
+            </div>
+            <button class="btn-primary-close" style="margin-top: 18px;" onclick="document.getElementById('androidInstallGuideModal').classList.add('hidden')">我知道了 👍</button>
+        </div>
+    </div>
+
+    <!-- iOS Safari 加入主畫面教學彈窗 -->
+    <div id="iosInstallModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 class="guide-modal-title">🍏 iPhone / iPad 加入桌面教學</h3>
+            <div class="guide-steps-box">
+                <p>1. 點擊瀏覽器最下方的 <strong>「分享」圖示 📤</strong></p>
+                <p>2. 往下滑動，點選 <strong>「加入主畫面」 ➕</strong></p>
+                <p>3. 點擊右上角 <strong>「新增」</strong> 即可在桌面秒開使用！</p>
+            </div>
+            <button class="btn-primary-close" style="margin-top: 18px;" onclick="document.getElementById('iosInstallModal').classList.add('hidden')">我知道了 👍</button>
+        </div>
+    </div>
+
+    <!-- 頂部極簡導覽列 (左側: 代表性 Icon + 1~50遊戲 / 右側: 安裝App按鈕 + 齒輪圖形) -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-brand">
+                <img src="z_img_app_192.png?v=6.10" alt="1~50遊戲" class="header-mini-avatar">
+                <span class="header-brand-title">1~50遊戲 <span style="font-size: 13px; color: #facc15; font-weight: 800; background: rgba(250, 204, 21, 0.2); padding: 2px 6px; border-radius: 6px; border: 1px solid #facc15; vertical-align: middle;">🧪測試版</span></span>
+            </div>
+
+            <!-- 頂端列右側按鈕群：安裝App 按鈕 + 齒輪設定 -->
+            <div class="header-actions">
+                <button id="btn-header-install" class="btn-header-install" title="將 1~50遊戲 安裝至桌面" onclick="triggerPWAInstall()">📲 安裝App</button>
+                <button id="btn-header-gear" class="btn-settings-gear" title="選擇難度設定" onclick="openDifficultyModal()">⚙️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主容器 -->
+    <main class="main-container">
+        
+        <!-- 頂部資訊列：左側提醒指示 + 右側難度設定與計時排行榜 -->
+        <div class="info-bar">
+            <!-- 左側：上方「提醒」標籤 + 下方目標數字方框 -->
+            <div class="info-column">
+                <span class="info-column-label">提醒</span>
+                <div id="hintDisplay" class="target-hint" title="目前應點選的目標數字">
+                    <span id="hintNumber" class="hint-number">1</span>
+                </div>
+            </div>
+
+            <!-- 右側群組：上方「難度」標籤+放大靶心按鈕 + 排行榜與計時器 (靠右對齊) -->
+            <div class="right-controls-group">
+                <!-- 難度直列群組：上方標籤 + 下方放大靶心正方形按鈕 -->
+                <div class="info-column">
+                    <span class="info-column-label">難度</span>
+                    <button id="difficultyBtn" class="btn-difficulty-square" onclick="openDifficultyModal()" title="點擊切換遊戲難度">
+                        <span class="diff-square-icon">🎯</span>
+                    </button>
+                </div>
+                
+                <!-- 計時器 + 歷史戰績(排行榜)按鈕 -->
+                <div class="right-timer-box">
+                    <div id="timerDisplay" class="timer">⏱️ 0.00 秒</div>
+                    <button id="historyBtn" class="btn-history" title="查看歷史戰績與排行榜">📊</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5x5 上方雙分隔線 -->
+        <div class="divider-double">
+            <div class="divider-line"></div>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- 5x5 核心遊戲網格 -->
+        <div class="game-container">
+            <div id="gameGrid" class="grid"></div>
+        </div>
+
+        <!-- 5x5 下方雙分隔線 -->
+        <div class="divider-double">
+            <div class="divider-line"></div>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- 底部版權與延緩失智陪伴聲明 (安全排版：按鈕移至最底端防止誤觸) -->
+        <footer class="app-footer">
+            <p class="footer-notice">此為延緩失智健腦遊戲，每日練習活化大腦</p>
+            <div class="footer-counters">
+                <span>累積遊玩：<strong id="totalPlays">0</strong> 次</span>
+                <span class="counter-sep">|</span>
+                <span>玩家總數：<strong id="totalVisitors">0</strong> 人</span>
+            </div>
+            <div class="footer-design-bar">
+                <span class="footer-design-text">App設計:陳新昱</span>
+                <button type="button" class="btn-footer-suggest" onclick="openFeedbackModal()" title="點擊向陳新昱提供寶貴建議">💡 我想建議</button>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- 設定與家庭守護彈窗 (難度選擇 + 晚輩守護儀表板) -->
+    <div id="difficultyModal" class="modal-overlay hidden">
+        <div class="modal-content settings-modal-content">
+            <!-- 頂端分頁切換 (Tabs) -->
+            <div class="modal-tabs">
+                <button type="button" id="tab-btn-diff" class="tab-btn active" onclick="switchSettingsTab('diff')">🎯 難度設定</button>
+                <button type="button" id="tab-btn-family" class="tab-btn" onclick="switchSettingsTab('family')">👨‍👩‍👧 家庭守護</button>
+            </div>
+
+            <!-- Tab 1: 難度選擇分頁 -->
+            <div id="tab-content-diff" class="tab-content-panel">
+                <div class="difficulty-options">
+                    <div class="difficulty-option" id="diff-x1" data-step="1">
+                        <div class="diff-label">標準模式</div>
+                        <div class="diff-desc">整數 1, 2, 3 … 50<br>共需點擊 50 次</div>
+                    </div>
+                    <div class="difficulty-option" id="diff-x2" data-step="2">
+                        <div class="diff-label">× 2 倍數</div>
+                        <div class="diff-desc">2, 4, 6 … 100<br>共需點擊 50 次</div>
+                    </div>
+                    <div class="difficulty-option" id="diff-x5" data-step="5">
+                        <div class="diff-label">× 5 倍數</div>
+                        <div class="diff-desc">5, 10, 15 … 250<br>共需點擊 50 次</div>
+                    </div>
+                    <div class="difficulty-option" id="diff-x7" data-step="7">
+                        <div class="diff-label">× 7 倍數</div>
+                        <div class="diff-desc">7, 14, 21 … 350<br>共需點擊 50 次</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 家庭守護分頁 (長輩狀態儀表板 / 身分設定) -->
+            <div id="tab-content-family" class="tab-content-panel hidden">
+                
+                <!-- 子視圖 A：晚輩守護儀表板 (長輩今日動態) -->
+                <div id="familyDashboardView" class="family-view-block hidden">
+                    <div class="family-status-header">
+                        <div class="family-email-badge">📧 <span id="dashFamilyEmail">family@gmail.com</span></div>
+                        <button type="button" class="btn-sm-edit" onclick="showFamilyConfigForm()" title="修改綁定設定">⚙️ 設定</button>
+                    </div>
+
+                    <div id="eldersCardsContainer" class="elders-cards-container">
+                        <!-- 長輩卡片將由 JS 動態渲染 (爸爸 / 媽媽) -->
+                        <div class="family-loading">載入長輩動態中... ⏳</div>
+                    </div>
+
+                    <div class="dash-actions-bar">
+                        <button type="button" class="btn-refresh-dash" onclick="fetchFamilyStatus(true)">🔄 重新整理</button>
+                        <button type="button" class="btn-test-sim" onclick="toggleTestSimulation()" title="切換測試模擬資料">🧪 測試模擬</button>
+                    </div>
+                </div>
+
+                <!-- 子視圖 B：長輩機綁定提示 -->
+                <div id="familyElderView" class="family-view-block hidden">
+                    <div class="elder-status-card">
+                        <div class="elder-avatar" id="elderAvatarIcon">👨</div>
+                        <h3 class="elder-role-title" id="elderRoleTitle">爸爸的手機 (訓練模式)</h3>
+                        <p class="elder-desc">已成功綁定家庭關心群組！每次完成遊戲時，系統將自動同步今日動態給晚輩。</p>
+                        <div class="elder-email-info">綁定信箱：<strong id="elderBoundEmail">-</strong></div>
+                        <button type="button" class="btn-modify-binding" onclick="showFamilyConfigForm()">變更身分或信箱</button>
+                    </div>
+                </div>
+
+                <!-- 子視圖 C：家庭設定表單 (綁定 Email + 角色單選) -->
+                <div id="familyFormView" class="family-view-block">
+                    <div class="family-form-box">
+                        <div class="form-title-group">
+                            <span class="form-icon">👨‍👩‍👧</span>
+                            <span class="form-title-text">家庭守護與動態同步</span>
+                        </div>
+                        <p class="form-tips">全家輸入同一個 Gmail，長輩動腦訓練，晚輩隨時掌握！</p>
+
+                        <div class="form-item">
+                            <label class="form-label-lg" for="familyInputEmail">1. 晚輩的 Gmail 信箱：</label>
+                            <input type="email" id="familyInputEmail" class="form-input-lg" placeholder="例如：family520@gmail.com" autocomplete="email">
+                        </div>
+
+                        <div class="form-item">
+                            <label class="form-label-lg">2. 這台手機是誰在使用？</label>
+                            <div class="role-selector-grid">
+                                <label class="role-option-card">
+                                    <input type="radio" name="familyRole" value="father" id="roleFather">
+                                    <div class="role-card-body">
+                                        <span class="role-emoji">👨</span>
+                                        <span class="role-name">爸爸</span>
+                                        <span class="role-sub">長輩訓練</span>
+                                    </div>
+                                </label>
+                                <label class="role-option-card">
+                                    <input type="radio" name="familyRole" value="mother" id="roleMother">
+                                    <div class="role-card-body">
+                                        <span class="role-emoji">👩</span>
+                                        <span class="role-name">媽媽</span>
+                                        <span class="role-sub">長輩訓練</span>
+                                    </div>
+                                </label>
+                                <label class="role-option-card">
+                                    <input type="radio" name="familyRole" value="junior" id="roleJunior">
+                                    <div class="role-card-body">
+                                        <span class="role-emoji">🧑</span>
+                                        <span class="role-name">晚輩</span>
+                                        <span class="role-sub">守護關心</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-btn-group">
+                            <button type="button" class="btn-save-family" onclick="saveFamilyConfig()">💾 儲存並綁定</button>
+                            <button type="button" id="btnCancelFamilyForm" class="btn-cancel-family hidden" onclick="cancelFamilyForm()">取消</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 彈窗底部統一關閉按鈕 -->
+            <button id="closeDifficultyBtn" class="btn-close" style="margin-top: 16px;" onclick="closeDifficultyModal()">關閉</button>
+        </div>
+    </div>
+
+    <!-- 挑戰完成結算彈窗 -->
+    <div id="resultModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-title">🎉 挑戰完成！</div>
+            <div id="finalScore" class="modal-score">本次成績：0.00 秒</div>
+            <div id="rankMessage" class="modal-rank"></div>
+            <div id="praiseMessage" class="modal-praise"></div>
+            <button id="restartBtn" class="btn-restart" onclick="restartGame()">再玩一次</button>
+        </div>
+    </div>
+
+    <!-- 歷史戰績彈窗 -->
+    <div id="historyModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-title">📊 歷史戰績</div>
+            <div id="historyModeLabel" class="history-subtitle">保留近 90 天的最佳紀錄</div>
+            <div id="historyList" class="history-list"></div>
+            <button id="closeHistoryBtn" class="btn-close" onclick="closeHistoryModal()">關閉</button>
+        </div>
+    </div>
+
+    <!-- 系統設計與開發建議反饋彈窗 (Feedback Modal) -->
+    <div id="feedbackModal" class="modal-overlay hidden">
+        <div class="modal-card feedback-modal-card">
+            <button id="btn-close-feedback-modal" class="btn-modal-close-x" title="關閉視窗" onclick="closeFeedbackModal()">✕</button>
+            <div class="feedback-modal-header">
+                <div class="feedback-avatar-badge">
+                    <span style="font-size: 26px;">💡</span>
+                    <span class="feedback-title-badge">App設計：陳新昱</span>
+                </div>
+            </div>
+            <p class="feedback-subtitle">歡迎留下您寶貴的使用心得或建議，我們將持續用心優化長輩的健腦體驗！</p>
+            <div class="feedback-form">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 16px; font-weight: 800; color:#f8fafc; display:block; margin-bottom:4px; text-align:left;">您的姓名或稱呼：</label>
+                    <input type="text" id="feedback-input-name" class="form-input" placeholder="例如：陳先生 / 小明">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 16px; font-weight: 800; color:#f8fafc; display:block; margin-bottom:4px; text-align:left;">您的聯絡手機：</label>
+                    <input type="tel" id="feedback-input-phone" class="form-input" placeholder="例如：0912345678">
+                </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" style="font-size: 16px; font-weight: 800; color:#f8fafc; display:block; margin-bottom:4px; text-align:left;">建議事項與回饋：</label>
+                    <textarea id="feedback-input-content" class="form-input" rows="4" placeholder="請在此留下您對玩法、字體大小、語音或版面的任何寶貴建議..."></textarea>
+                </div>
+                <button id="btn-submit-feedback" class="btn-primary-save" onclick="submitFeedback()">✉️ 送出建議</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js?v=6.10"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js?v=6.10')
+                    .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
+                    .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
+            });
+        }
+    </script>
+</body>
+</html>
