@@ -289,6 +289,9 @@ function endGame() {
     
     DOM.resultModal.classList.remove('hidden');
     saveScoreToLocal(finalTime, nowTimestamp);
+
+    // 長輩機自動雲端同步 (爸爸/媽媽遊玩紀錄回報)
+    reportElderPlayToCloud(finalTime, MODES[currentMode].label);
 }
 
 // ==========================================
@@ -570,4 +573,313 @@ function updateCounters(data) {
         const el = document.getElementById('totalVisitors');
         if (el) el.innerText = data.visitors;
     }
+}
+
+// ==========================================
+// 8. 家庭守護與長輩動態模組 (Family Guardian Module v6.10)
+// ==========================================
+const FAMILY_STORAGE_KEY = '1to50_family_config';
+let isSimulationMode = false; // 是否處於測試模擬模式
+
+// 取得家庭設定
+function getFamilyConfig() {
+    try {
+        const data = localStorage.getItem(FAMILY_STORAGE_KEY);
+        return data ? JSON.parse(data) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// 儲存家庭設定
+window.saveFamilyConfig = function saveFamilyConfig() {
+    const emailInput = document.getElementById('familyInputEmail');
+    const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+    
+    const roleRadio = document.querySelector('input[name="familyRole"]:checked');
+    const role = roleRadio ? roleRadio.value : '';
+
+    if (!email || !email.includes('@')) {
+        alert('請輸入正確的 Gmail 信箱格式！');
+        if (emailInput) emailInput.focus();
+        return;
+    }
+
+    if (!role) {
+        alert('請選擇這台手機的使用者角色（爸爸 / 媽媽 / 晚輩）！');
+        return;
+    }
+
+    const config = {
+        email: email,
+        role: role,
+        name: role === 'father' ? '爸爸' : (role === 'mother' ? '媽媽' : '晚輩'),
+        updatedAt: Date.now()
+    };
+
+    localStorage.setItem(FAMILY_STORAGE_KEY, JSON.stringify(config));
+    alert(`🎉 綁定成功！\n身分：${config.name}\n信箱：${config.email}`);
+    
+    renderFamilyView();
+};
+
+// 取消修改並返回原本視圖
+window.cancelFamilyForm = function cancelFamilyForm() {
+    renderFamilyView();
+};
+
+// 顯示修改表單
+window.showFamilyConfigForm = function showFamilyConfigForm() {
+    const config = getFamilyConfig();
+    const formView = document.getElementById('familyFormView');
+    const elderView = document.getElementById('familyElderView');
+    const dashView = document.getElementById('familyDashboardView');
+    const btnCancel = document.getElementById('btnCancelFamilyForm');
+
+    if (formView) formView.classList.remove('hidden');
+    if (elderView) elderView.classList.add('hidden');
+    if (dashView) dashView.classList.add('hidden');
+
+    if (config) {
+        const emailInput = document.getElementById('familyInputEmail');
+        if (emailInput) emailInput.value = config.email || '';
+        
+        const radio = document.querySelector(`input[name="familyRole"][value="${config.role}"]`);
+        if (radio) radio.checked = true;
+        
+        if (btnCancel) btnCancel.classList.remove('hidden');
+    } else {
+        if (btnCancel) btnCancel.classList.add('hidden');
+    }
+};
+
+// 分頁切換 (難度設定 vs 家庭守護)
+window.switchSettingsTab = function switchSettingsTab(tab) {
+    const tabBtnDiff = document.getElementById('tab-btn-diff');
+    const tabBtnFamily = document.getElementById('tab-btn-family');
+    const panelDiff = document.getElementById('tab-content-diff');
+    const panelFamily = document.getElementById('tab-content-family');
+
+    if (tab === 'diff') {
+        if (tabBtnDiff) tabBtnDiff.classList.add('active');
+        if (tabBtnFamily) tabBtnFamily.classList.remove('active');
+        if (panelDiff) panelDiff.classList.remove('hidden');
+        if (panelFamily) panelFamily.classList.add('hidden');
+    } else {
+        if (tabBtnDiff) tabBtnDiff.classList.remove('active');
+        if (tabBtnFamily) tabBtnFamily.classList.add('active');
+        if (panelDiff) panelDiff.classList.add('hidden');
+        if (panelFamily) panelFamily.classList.remove('hidden');
+        renderFamilyView();
+    }
+};
+
+// 依據設定渲染家庭守護介面視圖
+function renderFamilyView() {
+    const config = getFamilyConfig();
+    const formView = document.getElementById('familyFormView');
+    const elderView = document.getElementById('familyElderView');
+    const dashView = document.getElementById('familyDashboardView');
+
+    if (!formView || !elderView || !dashView) return;
+
+    if (!config) {
+        // 未綁定：顯示設定表單
+        formView.classList.remove('hidden');
+        elderView.classList.add('hidden');
+        dashView.classList.add('hidden');
+        const btnCancel = document.getElementById('btnCancelFamilyForm');
+        if (btnCancel) btnCancel.classList.add('hidden');
+    } else if (config.role === 'father' || config.role === 'mother') {
+        // 長輩機：顯示綁定狀態卡片
+        formView.classList.add('hidden');
+        elderView.classList.remove('hidden');
+        dashView.classList.add('hidden');
+
+        const avatarIcon = document.getElementById('elderAvatarIcon');
+        const roleTitle = document.getElementById('elderRoleTitle');
+        const boundEmail = document.getElementById('elderBoundEmail');
+
+        if (avatarIcon) avatarIcon.innerText = config.role === 'father' ? '👨' : '👩';
+        if (roleTitle) roleTitle.innerText = `${config.name}的手機 (訓練模式)`;
+        if (boundEmail) boundEmail.innerText = config.email;
+    } else {
+        // 晚輩機：顯示守護儀表板
+        formView.classList.add('hidden');
+        elderView.classList.add('hidden');
+        dashView.classList.remove('hidden');
+
+        const dashEmail = document.getElementById('dashFamilyEmail');
+        if (dashEmail) dashEmail.innerText = config.email;
+
+        fetchFamilyStatus(false);
+    }
+}
+
+// 晚輩拉取長輩今日動態 (GAS API 或模擬資料)
+window.fetchFamilyStatus = function fetchFamilyStatus(isManual) {
+    const container = document.getElementById('eldersCardsContainer');
+    if (!container) return;
+
+    const config = getFamilyConfig();
+    if (!config) return;
+
+    if (isManual) {
+        container.innerHTML = '<div class="family-loading">正在同步最新動態... ⏳</div>';
+    }
+
+    if (isSimulationMode) {
+        // 測試模擬情境
+        setTimeout(() => {
+            const mockData = {
+                status: 'success',
+                elders: [
+                    { role: 'mother', name: '媽媽', todayPlays: 3, bestScore: 46.85, lastPlayTime: '今天 14:20', streakDays: 5 },
+                    { role: 'father', name: '爸爸', todayPlays: 0, bestScore: null, lastPlayTime: '昨天 19:10', streakDays: 0 }
+                ]
+            };
+            renderEldersCards(mockData.elders);
+        }, 300);
+        return;
+    }
+
+    // 發送雲端 API 查詢
+    const apiUrl = `${GAS_API_URL}?action=get_family_status&email=${encodeURIComponent(config.email)}&t=${Date.now()}`;
+    
+    fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.status === 'success' && Array.isArray(data.elders)) {
+                renderEldersCards(data.elders);
+            } else {
+                container.innerHTML = `<div class="family-loading" style="color:#f87171;">⚠️ 尚無長輩遊玩數據或連線異常</div>`;
+            }
+        })
+        .catch(err => {
+            console.error('長輩動態查詢失敗:', err);
+            // 容錯降級：提供預設空狀態與手動模擬提示
+            renderEldersCards([
+                { role: 'father', name: '爸爸', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 },
+                { role: 'mother', name: '媽媽', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 }
+            ]);
+        });
+};
+
+// 渲染爸爸與媽媽的動態卡片
+function renderEldersCards(elders) {
+    const container = document.getElementById('eldersCardsContainer');
+    if (!container) return;
+
+    if (!elders || elders.length === 0) {
+        container.innerHTML = `<div class="family-loading">尚未有長輩遊玩數據</div>`;
+        return;
+    }
+
+    let html = '';
+    elders.forEach(elder => {
+        const isFather = elder.role === 'father';
+        const emoji = isFather ? '👨' : '👩';
+        const playedToday = elder.todayPlays > 0;
+        const cardClass = playedToday ? 'elder-dash-card card-active' : 'elder-dash-card card-warning';
+        
+        const badgeHtml = playedToday
+            ? `<span class="elder-status-badge badge-success">🟢 今日已動腦 (${elder.todayPlays}次)</span>`
+            : `<span class="elder-status-badge badge-warning">🔴 今日尚未遊玩</span>`;
+
+        const bestScoreStr = elder.bestScore ? `${parseFloat(elder.bestScore).toFixed(2)} 秒` : '尚未挑戰';
+        const lastPlayStr = elder.lastPlayTime ? elder.lastPlayTime : '尚無紀錄';
+        const streakStr = elder.streakDays > 0 ? `連續 ${elder.streakDays} 天 🔥` : '今日待開局';
+
+        html += `
+            <div class="${cardClass}">
+                <div class="elder-card-header">
+                    <div class="elder-name-group">
+                        <span class="elder-name-emoji">${emoji}</span>
+                        <span class="elder-name-text">${elder.name}</span>
+                    </div>
+                    ${badgeHtml}
+                </div>
+
+                <div class="elder-stats-grid">
+                    <div class="stat-box-item">
+                        <div>今日最佳成績</div>
+                        <div class="stat-box-val highlight">${bestScoreStr}</div>
+                    </div>
+                    <div class="stat-box-item">
+                        <div>連續挑戰天數</div>
+                        <div class="stat-box-val">${streakStr}</div>
+                    </div>
+                    <div class="stat-box-item" style="grid-column: span 2;">
+                        <div>最後挑戰時間：<strong style="color:#e2e8f0;">${lastPlayStr}</strong></div>
+                    </div>
+                </div>
+
+                <div class="elder-card-actions">
+                    <button type="button" class="btn-line-care" onclick="sendLineCare('${elder.role}', '${elder.name}', ${elder.todayPlays}, '${bestScoreStr}')">
+                        <span>💬 LINE 關心${elder.name}</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// 測試模擬資料切換開關
+window.toggleTestSimulation = function toggleTestSimulation() {
+    isSimulationMode = !isSimulationMode;
+    alert(isSimulationMode ? '🧪 已開啟【測試模擬模式】：目前展示模擬爸爸/媽媽數據！' : '🟢 已切換回【雲端即時連線模式】！');
+    fetchFamilyStatus(true);
+};
+
+// 一鍵生成 LINE 貼心問候並開啟分享
+window.sendLineCare = function sendLineCare(role, name, todayPlays, bestScore) {
+    let message = '';
+    if (todayPlays > 0) {
+        message = `${name}～我看到您今天已經玩了 ${todayPlays} 次 1~50 健腦遊戲，最佳成績 ${bestScore}，太厲害了！繼續保持天天動動腦喔！❤️`;
+    } else {
+        message = `${name}～今天還沒玩 1~50 延緩失智動動腦遊戲喔！有空時記得打開玩個 2 局，活化大腦放鬆一下～🌟 遊戲網址：https://pod0987183520.github.io/1to50/`;
+    }
+
+    const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(message)}`;
+    
+    // 若在支援 Web Share API 的手機上優先開啟分享
+    if (navigator.share) {
+        navigator.share({
+            title: `關心${name}健腦動態`,
+            text: message
+        }).catch(() => {
+            window.open(lineUrl, '_blank');
+        });
+    } else {
+        window.open(lineUrl, '_blank');
+    }
+};
+
+// 長輩完成遊戲時，背景自動同步給 GAS 雲端
+function reportElderPlayToCloud(score, modeLabel) {
+    const config = getFamilyConfig();
+    if (!config || (config.role !== 'father' && config.role !== 'mother')) {
+        return; // 非長輩機或未綁定，不需回報
+    }
+
+    const payload = {
+        action: 'report_play',
+        email: config.email,
+        role: config.role,
+        name: config.name,
+        score: score,
+        mode: modeLabel,
+        timestamp: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hour12: false })
+    };
+
+    const query = Object.keys(payload)
+        .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(payload[k])}`)
+        .join('&');
+
+    // 背景靜默送出，不干擾長輩遊戲體驗
+    fetch(`${GAS_API_URL}?${query}`, { mode: 'no-cors' })
+        .then(() => console.log('長輩遊玩數據已同步至雲端'))
+        .catch(err => console.error('長輩數據同步失敗:', err));
 }

@@ -13,12 +13,12 @@
     <meta property="og:title" content="1~50遊戲 - (陳新昱設計)">
     <meta property="og:description" content="預防長輩失智的專用腦力訓練遊戲，每日挑戰活化大腦！">
     <meta property="og:url" content="https://pod0987183520.github.io/1to50/">
-    <meta property="og:image" content="https://pod0987183520.github.io/1to50/z_img_app_512.png?v=6.00">
+    <meta property="og:image" content="https://pod0987183520.github.io/1to50/z_img_app_512.png?v=6.10">
 
-    <link rel="icon" href="z_img_app_192.png?v=6.00" type="image/png">
-    <link rel="apple-touch-icon" href="z_img_app_192.png?v=6.00">
-    <link rel="manifest" href="manifest.json?v=6.00">
-    <link rel="stylesheet" href="style.css?v=6.00">
+    <link rel="icon" href="z_img_app_192.png?v=6.10" type="image/png">
+    <link rel="apple-touch-icon" href="z_img_app_192.png?v=6.10">
+    <link rel="manifest" href="manifest.json?v=6.10">
+    <link rel="stylesheet" href="style.css?v=6.10">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -169,29 +169,124 @@
 
     </main>
 
-    <!-- 難度選擇彈窗 -->
+    <!-- 設定與家庭守護彈窗 (難度選擇 + 晚輩守護儀表板) -->
     <div id="difficultyModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-title">🎯 選擇難度</div>
-            <div class="difficulty-options">
-                <div class="difficulty-option" id="diff-x1" data-step="1">
-                    <div class="diff-label">標準模式</div>
-                    <div class="diff-desc">整數 1, 2, 3 … 50<br>共需點擊 50 次</div>
-                </div>
-                <div class="difficulty-option" id="diff-x2" data-step="2">
-                    <div class="diff-label">× 2 倍數</div>
-                    <div class="diff-desc">2, 4, 6 … 100<br>共需點擊 50 次</div>
-                </div>
-                <div class="difficulty-option" id="diff-x5" data-step="5">
-                    <div class="diff-label">× 5 倍數</div>
-                    <div class="diff-desc">5, 10, 15 … 250<br>共需點擊 50 次</div>
-                </div>
-                <div class="difficulty-option" id="diff-x7" data-step="7">
-                    <div class="diff-label">× 7 倍數</div>
-                    <div class="diff-desc">7, 14, 21 … 350<br>共需點擊 50 次</div>
+        <div class="modal-content settings-modal-content">
+            <!-- 頂端分頁切換 (Tabs) -->
+            <div class="modal-tabs">
+                <button type="button" id="tab-btn-diff" class="tab-btn active" onclick="switchSettingsTab('diff')">🎯 難度設定</button>
+                <button type="button" id="tab-btn-family" class="tab-btn" onclick="switchSettingsTab('family')">👨‍👩‍👧 家庭守護</button>
+            </div>
+
+            <!-- Tab 1: 難度選擇分頁 -->
+            <div id="tab-content-diff" class="tab-content-panel">
+                <div class="difficulty-options">
+                    <div class="difficulty-option" id="diff-x1" data-step="1">
+                        <div class="diff-label">標準模式</div>
+                        <div class="diff-desc">整數 1, 2, 3 … 50<br>共需點擊 50 次</div>
+                    </div>
+                    <div class="difficulty-option" id="diff-x2" data-step="2">
+                        <div class="diff-label">× 2 倍數</div>
+                        <div class="diff-desc">2, 4, 6 … 100<br>共需點擊 50 次</div>
+                    </div>
+                    <div class="difficulty-option" id="diff-x5" data-step="5">
+                        <div class="diff-label">× 5 倍數</div>
+                        <div class="diff-desc">5, 10, 15 … 250<br>共需點擊 50 次</div>
+                    </div>
+                    <div class="difficulty-option" id="diff-x7" data-step="7">
+                        <div class="diff-label">× 7 倍數</div>
+                        <div class="diff-desc">7, 14, 21 … 350<br>共需點擊 50 次</div>
+                    </div>
                 </div>
             </div>
-            <button id="closeDifficultyBtn" class="btn-close" style="margin-top: 15px;" onclick="closeDifficultyModal()">關閉</button>
+
+            <!-- Tab 2: 家庭守護分頁 (長輩狀態儀表板 / 身分設定) -->
+            <div id="tab-content-family" class="tab-content-panel hidden">
+                
+                <!-- 子視圖 A：晚輩守護儀表板 (長輩今日動態) -->
+                <div id="familyDashboardView" class="family-view-block hidden">
+                    <div class="family-status-header">
+                        <div class="family-email-badge">📧 <span id="dashFamilyEmail">family@gmail.com</span></div>
+                        <button type="button" class="btn-sm-edit" onclick="showFamilyConfigForm()" title="修改綁定設定">⚙️ 設定</button>
+                    </div>
+
+                    <div id="eldersCardsContainer" class="elders-cards-container">
+                        <!-- 長輩卡片將由 JS 動態渲染 (爸爸 / 媽媽) -->
+                        <div class="family-loading">載入長輩動態中... ⏳</div>
+                    </div>
+
+                    <div class="dash-actions-bar">
+                        <button type="button" class="btn-refresh-dash" onclick="fetchFamilyStatus(true)">🔄 重新整理</button>
+                        <button type="button" class="btn-test-sim" onclick="toggleTestSimulation()" title="切換測試模擬資料">🧪 測試模擬</button>
+                    </div>
+                </div>
+
+                <!-- 子視圖 B：長輩機綁定提示 -->
+                <div id="familyElderView" class="family-view-block hidden">
+                    <div class="elder-status-card">
+                        <div class="elder-avatar" id="elderAvatarIcon">👨</div>
+                        <h3 class="elder-role-title" id="elderRoleTitle">爸爸的手機 (訓練模式)</h3>
+                        <p class="elder-desc">已成功綁定家庭關心群組！每次完成遊戲時，系統將自動同步今日動態給晚輩。</p>
+                        <div class="elder-email-info">綁定信箱：<strong id="elderBoundEmail">-</strong></div>
+                        <button type="button" class="btn-modify-binding" onclick="showFamilyConfigForm()">變更身分或信箱</button>
+                    </div>
+                </div>
+
+                <!-- 子視圖 C：家庭設定表單 (綁定 Email + 角色單選) -->
+                <div id="familyFormView" class="family-view-block">
+                    <div class="family-form-box">
+                        <div class="form-title-group">
+                            <span class="form-icon">👨‍👩‍👧</span>
+                            <span class="form-title-text">家庭守護與動態同步</span>
+                        </div>
+                        <p class="form-tips">全家輸入同一個 Gmail，長輩動腦訓練，晚輩隨時掌握！</p>
+
+                        <div class="form-item">
+                            <label class="form-label-lg" for="familyInputEmail">1. 晚輩的 Gmail 信箱：</label>
+                            <input type="email" id="familyInputEmail" class="form-input-lg" placeholder="例如：family520@gmail.com" autocomplete="email">
+                        </div>
+
+                        <div class="form-item">
+                            <label class="form-label-lg">2. 這台手機是誰在使用？</label>
+                            <div class="role-selector-grid">
+                                <label class="role-option-card">
+                                    <input type="radio" name="familyRole" value="father" id="roleFather">
+                                    <div class="role-card-body">
+                                        <span class="role-emoji">👨</span>
+                                        <span class="role-name">爸爸</span>
+                                        <span class="role-sub">長輩訓練</span>
+                                    </div>
+                                </label>
+                                <label class="role-option-card">
+                                    <input type="radio" name="familyRole" value="mother" id="roleMother">
+                                    <div class="role-card-body">
+                                        <span class="role-emoji">👩</span>
+                                        <span class="role-name">媽媽</span>
+                                        <span class="role-sub">長輩訓練</span>
+                                    </div>
+                                </label>
+                                <label class="role-option-card">
+                                    <input type="radio" name="familyRole" value="junior" id="roleJunior">
+                                    <div class="role-card-body">
+                                        <span class="role-emoji">🧑</span>
+                                        <span class="role-name">晚輩</span>
+                                        <span class="role-sub">守護關心</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-btn-group">
+                            <button type="button" class="btn-save-family" onclick="saveFamilyConfig()">💾 儲存並綁定</button>
+                            <button type="button" id="btnCancelFamilyForm" class="btn-cancel-family hidden" onclick="cancelFamilyForm()">取消</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 彈窗底部統一關閉按鈕 -->
+            <button id="closeDifficultyBtn" class="btn-close" style="margin-top: 16px;" onclick="closeDifficultyModal()">關閉</button>
         </div>
     </div>
 
@@ -245,12 +340,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=6.00"></script>
+    <script src="game.js?v=6.10"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=6.00')
+                navigator.serviceWorker.register('sw.js?v=6.10')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.log('ServiceWorker 註冊失敗: ', err));
             });
