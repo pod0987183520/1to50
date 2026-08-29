@@ -1,9 +1,9 @@
 /**
- * 1~50 遊戲 - Google Apps Script (GAS) 雲端後端程式碼 (v7.00 正式版)
+ * 1~50 遊戲 - Google Apps Script (GAS) 雲端後端程式碼 (v7.01 正式版 - 支援 JSONP 極速直連)
  * 
  * 包含功能：
  * 1. 【長輩家庭守護】接收爸爸/媽媽遊玩數據 (action: report_play)
- * 2. 【晚輩守護儀表板】查詢指定 Email 家庭的長輩今日遊玩狀態 (action: get_family_status)
+ * 2. 【晚輩守護儀表板】查詢指定 Email 家庭的長輩今日遊玩狀態 (action: get_family_status, 支援 callback JSONP)
  * 3. 【網站計數器】累積遊玩次數與玩家總數 (action: count / new_user)
  * 4. 【建議反饋】接收使用者提交的心得建議 (action: feedback)
  */
@@ -24,6 +24,7 @@ function handleRequest(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var params = (e && e.parameter) ? e.parameter : {};
     var action = params.action || '';
+    var callback = params.callback || '';
 
     // 輔助：安全將日期物件或字串轉為 yyyy-MM-dd
     function normalizeDateStr(val) {
@@ -69,7 +70,7 @@ function handleRequest(e) {
       var dateStr = Utilities.formatDate(nowDate, "Asia/Taipei", "yyyy-MM-dd");
 
       if (!email || !role) {
-        return createJsonResponse({ status: 'error', message: '缺少 Email 或角色資訊' });
+        return createJsonResponse({ status: 'error', message: '缺少 Email 或角色資訊' }, callback);
       }
 
       var sheetName = "長輩遊玩紀錄";
@@ -81,7 +82,7 @@ function handleRequest(e) {
 
       sheet.appendRow([timeStr, email, role, name, dateStr, score, mode]);
 
-      return createJsonResponse({ status: 'success', message: '長輩紀錄已成功同步！' });
+      return createJsonResponse({ status: 'success', message: '長輩紀錄已成功同步！' }, callback);
     }
 
     // ==========================================
@@ -90,7 +91,7 @@ function handleRequest(e) {
     if (action === 'get_family_status') {
       var searchEmail = (params.email || '').trim().toLowerCase();
       if (!searchEmail) {
-        return createJsonResponse({ status: 'error', message: '請提供家庭 Email' });
+        return createJsonResponse({ status: 'error', message: '請提供家庭 Email' }, callback);
       }
 
       var sheet = ss.getSheetByName("長輩遊玩紀錄");
@@ -159,7 +160,7 @@ function handleRequest(e) {
         familyEmail: searchEmail,
         today: todayStr,
         elders: [eldersData.father, eldersData.mother]
-      });
+      }, callback);
     }
 
     // ==========================================
@@ -177,7 +178,7 @@ function handleRequest(e) {
         sheetFeedback.appendRow(["提交時間", "姓名", "電話", "建議內容"]);
       }
       sheetFeedback.appendRow([time, name, phone, content]);
-      return createJsonResponse({ status: 'success', message: '感謝您的寶貴建議！' });
+      return createJsonResponse({ status: 'success', message: '感謝您的寶貴建議！' }, callback);
     }
 
     // ==========================================
@@ -199,16 +200,22 @@ function handleRequest(e) {
       status: 'success',
       totalPlays: totalPlays,
       totalVisitors: totalVisitors
-    });
+    }, callback);
 
   } catch (err) {
-    return createJsonResponse({ status: 'error', message: err.toString() });
+    return createJsonResponse({ status: 'error', message: err.toString() }, callback);
   } finally {
     lock.releaseLock();
   }
 }
 
-function createJsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
+function createJsonResponse(data, callback) {
+  var jsonStr = JSON.stringify(data);
+  if (callback && callback.trim()) {
+    // JSONP 格式輸出
+    return ContentService.createTextOutput(callback.trim() + '(' + jsonStr + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(jsonStr)
     .setMimeType(ContentService.MimeType.JSON);
 }

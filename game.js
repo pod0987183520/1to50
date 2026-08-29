@@ -717,52 +717,65 @@ function renderFamilyView() {
 }
 
 // 晚輩拉取長輩今日動態 (GAS API 或模擬資料)
+// 晚輩拉取長輩今日動態 (採用 JSONP 極速直連 + 8秒逾時防禦機制)
 window.fetchFamilyStatus = function fetchFamilyStatus(isManual) {
     const container = document.getElementById('eldersCardsContainer');
     if (!container) return;
 
     const config = getFamilyConfig();
-    if (!config) return;
+    if (!config || !config.email) return;
 
-    if (isManual) {
-        container.innerHTML = '<div class="family-loading">正在同步最新動態... ⏳</div>';
-    }
+    container.innerHTML = isManual
+        ? '<div class="family-loading">正在同步最新動態... ⏳</div>'
+        : '<div class="family-loading">載入長輩動態中... ⏳</div>';
 
-    if (isSimulationMode) {
-        // 測試模擬情境
-        setTimeout(() => {
-            const mockData = {
-                status: 'success',
-                elders: [
-                    { role: 'mother', name: '媽媽', todayPlays: 3, bestScore: 46.85, lastPlayTime: '今天 14:20', streakDays: 5 },
-                    { role: 'father', name: '爸爸', todayPlays: 0, bestScore: null, lastPlayTime: '昨天 19:10', streakDays: 0 }
-                ]
-            };
-            renderEldersCards(mockData.elders);
-        }, 300);
-        return;
-    }
+    let isCompleted = false;
+    const callbackName = 'gasFamilyCb_' + Math.floor(Math.random() * 1000000);
 
-    // 發送雲端 API 查詢
-    const apiUrl = `${GAS_API_URL}?action=get_family_status&email=${encodeURIComponent(config.email)}&t=${Date.now()}`;
-    
-    fetch(apiUrl)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.status === 'success' && Array.isArray(data.elders)) {
-                renderEldersCards(data.elders);
-            } else {
-                container.innerHTML = `<div class="family-loading" style="color:#f87171;">⚠️ 尚無長輩遊玩數據或連線異常</div>`;
-            }
-        })
-        .catch(err => {
-            console.error('長輩動態查詢失敗:', err);
-            // 容錯降級：提供預設空狀態與手動模擬提示
-            renderEldersCards([
-                { role: 'father', name: '爸爸', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 },
-                { role: 'mother', name: '媽媽', todayPlays: 0, bestScore: null, lastPlayTime: '尚無紀錄', streakDays: 0 }
-            ]);
-        });
+    // 8 秒逾時防禦機制，絕不無限卡死
+    const timer = setTimeout(() => {
+        if (!isCompleted) {
+            isCompleted = true;
+            delete window[callbackName];
+            const oldScript = document.getElementById(callbackName);
+            if (oldScript) oldScript.remove();
+            container.innerHTML = `
+                <div class="family-loading" style="color:#fbbf24;">
+                    ⚠️ 連線稍慢或逾時，請點下方按鈕重新整理
+                </div>
+            `;
+        }
+    }, 8000);
+
+    // 定義 JSONP 回呼函式
+    window[callbackName] = function(data) {
+        if (isCompleted) return;
+        isCompleted = true;
+        clearTimeout(timer);
+        delete window[callbackName];
+        const oldScript = document.getElementById(callbackName);
+        if (oldScript) oldScript.remove();
+
+        if (data && data.status === 'success' && Array.isArray(data.elders)) {
+            renderEldersCards(data.elders);
+        } else {
+            container.innerHTML = `<div class="family-loading" style="color:#f87171;">⚠️ 尚無長輩遊玩數據或連線異常</div>`;
+        }
+    };
+
+    // 動態載入 Script 標籤 (JSONP 徹底繞過 CORS 與重定向問題)
+    const script = document.createElement('script');
+    script.id = callbackName;
+    script.src = `${GAS_API_URL}?action=get_family_status&email=${encodeURIComponent(config.email)}&callback=${callbackName}&t=${Date.now()}`;
+    script.onerror = function() {
+        if (isCompleted) return;
+        isCompleted = true;
+        clearTimeout(timer);
+        delete window[callbackName];
+        script.remove();
+        container.innerHTML = `<div class="family-loading" style="color:#f87171;">⚠️ 雲端連線失敗，請檢查網路或稍後重試</div>`;
+    };
+    document.body.appendChild(script);
 };
 
 // 渲染爸爸與媽媽的動態卡片
@@ -790,7 +803,6 @@ function renderEldersCards(elders) {
         let lastPlayStr = '尚無紀錄';
         if (elder.lastPlayTime && elder.lastPlayTime !== '尚無紀錄') {
             const raw = elder.lastPlayTime.toString();
-            // 如果已經是中文字串格式 (2026/08/29 (六) 23:24) 直接使用
             if (raw.includes('(') && raw.includes(')')) {
                 lastPlayStr = raw;
             } else {
@@ -809,6 +821,7 @@ function renderEldersCards(elders) {
                 }
             }
         }
+        const bestScoreStr = elder.bestScore ? `${parseFloat(elder.bestScore).toFixed(2)} 秒` : '尚未挑戰';
         const streakStr = elder.streakDays > 0 ? `連續 ${elder.streakDays} 天 🔥` : '今日待開局';
 
         html += `
@@ -846,13 +859,6 @@ function renderEldersCards(elders) {
 
     container.innerHTML = html;
 }
-
-// 測試模擬資料切換開關
-window.toggleTestSimulation = function toggleTestSimulation() {
-    isSimulationMode = !isSimulationMode;
-    alert(isSimulationMode ? '🧪 已開啟【測試模擬模式】：目前展示模擬爸爸/媽媽數據！' : '🟢 已切換回【雲端即時連線模式】！');
-    fetchFamilyStatus(true);
-};
 
 // 一鍵生成 LINE 貼心問候並開啟分享
 window.sendLineCare = function sendLineCare(role, name, todayPlays, bestScore) {
