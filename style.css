@@ -1275,46 +1275,92 @@ html.is-pwa-standalone #btn-header-install {
 }
 
 /* ==========================================================================
-   6. 電腦版寬螢幕專屬中式無痕直排對聯 (完全不干擾、零縮小 5x5 棋盤)
+   6. 電腦版寬螢幕專屬 HUD 賽博光軌微導光對聯 (Cyber Glow / 零佔用 5x5 寬度)
    ========================================================================== */
 @media (min-width: 768px) {
-    /* 中式無痕直排對聯：純文字懸浮、無背景、無邊框、非按鈕、無痕貼在棋盤兩側 */
+    /* HUD 賽博光軌直排對聯：絕對定位懸浮、無按鈕粗厚感、極致科技全息微光 */
     .couplet {
-        display: block !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         writing-mode: vertical-rl;
         text-orientation: upright;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
+        background: rgba(10, 23, 16, 0.35) !important;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        padding: 10px 8px !important;
         margin: 0 !important;
-        color: #fef08a; /* 典雅金黃微光字體 */
-        font-size: 24px;
-        font-weight: 900;
-        letter-spacing: 13px; /* 10 個中文字垂直自然舒展 */
-        line-height: 1;
-        text-shadow: 0 0 14px rgba(254, 240, 138, 0.5), 0 2px 6px rgba(0, 0, 0, 0.9);
         pointer-events: none;
         white-space: nowrap;
         user-select: none;
         z-index: 10;
+        animation: hudPulse 3.5s ease-in-out infinite alternate;
+        box-sizing: border-box;
     }
 
-    /* 左聯：無痕貼在 5x5 棋盤左外側 */
+    /* 左聯：靠近 5x5 棋盤側鑲嵌青翠晴空微光導軌，外緣圓潤 */
     .couplet-left {
         right: calc(100% + 22px);
+        border: none !important;
+        border-right: 1.5px solid rgba(56, 189, 248, 0.65) !important;
+        border-radius: 6px 0 0 6px;
+        box-shadow: 2px 0 10px rgba(56, 189, 248, 0.3), inset -1px 0 4px rgba(74, 222, 128, 0.15) !important;
     }
 
-    /* 右聯：無痕貼在 5x5 棋盤右外側 */
+    /* 右聯：靠近 5x5 棋盤側鑲嵌青翠晴空微光導軌，外緣圓潤 */
     .couplet-right {
         left: calc(100% + 22px);
+        border: none !important;
+        border-left: 1.5px solid rgba(56, 189, 248, 0.65) !important;
+        border-radius: 0 6px 6px 0;
+        box-shadow: -2px 0 10px rgba(56, 189, 248, 0.3), inset 1px 0 4px rgba(74, 222, 128, 0.15) !important;
+    }
+
+    /* HUD 頂端與底端科技幾何節點 (晴空霓虹發光菱形) */
+    .hud-node {
+        font-size: 10px;
+        color: #38bdf8;
+        line-height: 1;
+        text-shadow: 0 0 8px #38bdf8, 0 0 16px rgba(56, 189, 248, 0.8);
+        opacity: 0.9;
+    }
+
+    .hud-node-top {
+        margin-bottom: 6px;
+    }
+
+    .hud-node-bottom {
+        margin-top: 6px;
+    }
+
+    /* HUD 全息立體書法金光字 (大字清晰、字間距舒展對稱) */
+    .hud-text {
+        color: #fef08a; /* 典雅帝王金 */
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 11px; /* 10 個中文字自然流暢拉開 */
+        line-height: 1;
+        text-shadow: 0 0 10px rgba(254, 240, 138, 0.6), 0 0 22px rgba(56, 189, 248, 0.35), 0 2px 4px rgba(0, 0, 0, 0.95);
     }
 
     /* 電腦版隱藏底部橫向宣導行，釋放垂直高度，徹底根除頂部與底部遮蔽 */
     .footer-notice {
         display: none !important;
+    }
+}
+
+/* 賽博全息微呼吸動效 (沉穩舒緩微光) */
+@keyframes hudPulse {
+    0% {
+        filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.3));
+        opacity: 0.92;
+    }
+    100% {
+        filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.65));
+        opacity: 1;
     }
 }
