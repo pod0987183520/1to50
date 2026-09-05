@@ -340,6 +340,18 @@ html.is-pwa-standalone #btn-header-install {
 /* ==========================================
    3. 5x5 遊戲主網格 (自適應螢幕大小，緊湊相依)
    ========================================== */
+.game-stage {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.couplet {
+    display: none; /* 手機垂直螢幕預設隱藏 */
+}
+
 .game-container {
     width: 100%;
     margin: 0 auto;
@@ -1267,4 +1279,124 @@ html.is-pwa-standalone #btn-header-install {
     font-weight: 800;
     border-radius: 10px;
     cursor: pointer;
+}
+
+/* ==========================================================================
+   6. 電腦版寬螢幕專屬中式直排對聯與防遮擋優化 (桌機優化 / 手機零干擾)
+   ========================================================================== */
+@media (min-width: 768px) {
+    /* 主容器放寬，提供足夠空間容納 5x5 核心棋盤與左右直排對聯 */
+    .main-container {
+        max-width: 720px;
+        padding: 4px 16px 8px 16px;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    /* 頂部資訊列與雙分隔線寬度精準對齊 5x5 棋盤，兩側留出空間給對聯牌匾 */
+    .info-bar {
+        max-width: min(94vw, calc(100dvh - 230px), 430px);
+        margin: 0 auto;
+    }
+
+    .divider-double {
+        max-width: min(94vw, calc(100dvh - 230px), 430px);
+        margin: 1px auto;
+    }
+
+    /* 遊戲主舞台：棋盤與左右直排對聯並列居中 */
+    .game-stage {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        width: 100%;
+        max-width: 680px;
+    }
+
+    .game-container {
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .grid {
+        max-width: min(94vw, calc(100dvh - 230px), 430px);
+        max-height: min(94vw, calc(100dvh - 230px), 430px);
+    }
+
+    /* 中式直排對聯牌匾 (深墨翡翠底 + 翡翠金邊微光 + 典雅金字) */
+    .couplet {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        background: linear-gradient(180deg, rgba(19, 46, 28, 0.92) 0%, rgba(10, 23, 16, 0.96) 100%);
+        border: 2px solid rgba(74, 222, 128, 0.45);
+        border-radius: 14px;
+        padding: 10px 8px;
+        color: #fef08a; /* 典雅金黃微光 */
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: 4px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), inset 0 0 10px rgba(74, 222, 128, 0.15);
+        text-shadow: 0 0 10px rgba(254, 240, 138, 0.5);
+        user-select: none;
+        box-sizing: border-box;
+        /* 高度與 5x5 棋盤完全等高 */
+        height: min(94vw, calc(100dvh - 230px), 430px);
+        width: 48px;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+    }
+
+    .couplet-left {
+        border-right: 2.5px solid #ffcc02;
+    }
+
+    .couplet-right {
+        border-left: 2.5px solid #ffcc02;
+    }
+
+    .couplet-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    /* 電腦版隱藏底部橫列宣導，釋放 35px 垂直高度，徹底根除頂部與底部遮蔽 */
+    .footer-notice {
+        display: none !important;
+    }
+
+    /* 底部計數器與按鈕精簡緊湊 */
+    .app-footer {
+        margin-top: 2px;
+        gap: 2px;
+    }
+
+    .footer-counters {
+        font-size: 15px;
+    }
+
+    .footer-counters strong {
+        font-size: 15px;
+    }
+
+    .footer-design-bar {
+        margin-top: 2px;
+    }
+
+    .footer-design-text {
+        font-size: 18px;
+    }
+
+    .btn-footer-suggest {
+        font-size: 15px;
+        padding: 3px 12px;
+    }
 }

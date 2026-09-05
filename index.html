@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=7.04" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=7.04">
     <link rel="manifest" href="manifest.json?v=7.04">
-    <link rel="stylesheet" href="style.css?v=7.04">
+    <link rel="stylesheet" href="style.css?v=7.05">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -142,9 +142,22 @@
             <div class="divider-line"></div>
         </div>
 
-        <!-- 5x5 核心遊戲網格 -->
-        <div class="game-container">
-            <div id="gameGrid" class="grid"></div>
+        <!-- 5x5 遊戲舞台區 (含電腦版左右直排對聯) -->
+        <div class="game-stage">
+            <!-- 左聯 (電腦版直排對聯) -->
+            <aside class="couplet couplet-left" aria-label="左聯：延緩失智提升手眼協調">
+                <span class="couplet-text">延緩失智提升手眼協調</span>
+            </aside>
+
+            <!-- 5x5 核心遊戲網格 -->
+            <div class="game-container">
+                <div id="gameGrid" class="grid"></div>
+            </div>
+
+            <!-- 右聯 (電腦版直排對聯) -->
+            <aside class="couplet couplet-right" aria-label="右聯：專注訓練也可加法乘法">
+                <span class="couplet-text">專注訓練也可加法乘法</span>
+            </aside>
         </div>
 
         <!-- 5x5 下方雙分隔線 -->
@@ -155,7 +168,7 @@
 
         <!-- 底部版權與延緩失智陪伴聲明 (安全排版：按鈕移至最底端防止誤觸) -->
         <footer class="app-footer">
-            <p class="footer-notice">此為延緩失智健腦遊戲，每日練習活化大腦</p>
+            <p class="footer-notice">延緩失智提升手眼協調 ‧ 專注訓練也可加法乘法</p>
             <div class="footer-counters">
                 <span>累積遊玩：<strong id="totalPlays">0</strong> 次</span>
                 <span class="counter-sep">|</span>
