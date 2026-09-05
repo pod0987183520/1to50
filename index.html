@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=7.04" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=7.04">
     <link rel="manifest" href="manifest.json?v=7.04">
-    <link rel="stylesheet" href="style.css?v=7.07">
+    <link rel="stylesheet" href="style.css?v=7.08">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -142,21 +142,21 @@
             <div class="divider-line"></div>
         </div>
 
-        <!-- 5x5 核心遊戲網格 (含電腦版左右 HUD 賽博光軌微導光對聯) -->
+        <!-- 5x5 核心遊戲網格 (含電腦版左右宮廷赤金朝氣對聯) -->
         <div class="game-container">
-            <!-- 左聯 (HUD 賽博光軌直排：長輩每天玩可延緩失智) -->
+            <!-- 左聯 (宮廷赤金朝氣直排：延緩長輩失智的可能性) -->
             <div class="couplet couplet-left" aria-hidden="true">
                 <span class="hud-node hud-node-top">◆</span>
-                <span class="hud-text">長輩每天玩可延緩失智</span>
+                <span class="hud-text">延緩長輩失智的可能性</span>
                 <span class="hud-node hud-node-bottom">◆</span>
             </div>
 
             <div id="gameGrid" class="grid"></div>
 
-            <!-- 右聯 (HUD 賽博光軌直排：小孩常玩可增加專注力) -->
+            <!-- 右聯 (宮廷赤金朝氣直排：提升小孩數字的專注力) -->
             <div class="couplet couplet-right" aria-hidden="true">
                 <span class="hud-node hud-node-top">◆</span>
-                <span class="hud-text">小孩常玩可增加專注力</span>
+                <span class="hud-text">提升小孩數字的專注力</span>
                 <span class="hud-node hud-node-bottom">◆</span>
             </div>
         </div>
@@ -169,7 +169,7 @@
 
         <!-- 底部版權與延緩失智陪伴聲明 (安全排版：按鈕移至最底端防止誤觸) -->
         <footer class="app-footer">
-            <p class="footer-notice">長輩每天玩可延緩失智 ‧ 小孩常玩可增加專注力</p>
+            <p class="footer-notice">延緩長輩失智的可能性 ‧ 提升小孩數字的專注力</p>
             <div class="footer-counters">
                 <span>累積遊玩：<strong id="totalPlays">0</strong> 次</span>
                 <span class="counter-sep">|</span>
@@ -353,12 +353,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=7.07"></script>
+    <script src="game.js?v=7.08"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.07')
+                navigator.serviceWorker.register('sw.js?v=7.08')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.error('ServiceWorker 註冊失敗: ', err));
             });

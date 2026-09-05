@@ -1275,10 +1275,10 @@ html.is-pwa-standalone #btn-header-install {
 }
 
 /* ==========================================================================
-   6. 電腦版寬螢幕專屬 HUD 賽博光軌微導光對聯 (Cyber Glow / 零佔用 5x5 寬度)
+   6. 電腦版寬螢幕專屬 宮廷赤金朝氣對聯 (春聯喜慶色系 / 朱砂紅光軌 + 璀璨金字)
    ========================================================================== */
 @media (min-width: 768px) {
-    /* HUD 賽博光軌直排對聯：絕對定位懸浮、無按鈕粗厚感、極致科技全息微光 */
+    /* 宮廷赤金直排對聯：絕對定位懸浮、朱砂暖紅微導軌、璀璨金字、福氣朝氣蓬勃 */
     .couplet {
         display: flex !important;
         flex-direction: column;
@@ -1289,7 +1289,7 @@ html.is-pwa-standalone #btn-header-install {
         transform: translateY(-50%);
         writing-mode: vertical-rl;
         text-orientation: upright;
-        background: rgba(10, 23, 16, 0.35) !important;
+        background: linear-gradient(180deg, rgba(153, 27, 27, 0.22) 0%, rgba(185, 28, 28, 0.28) 50%, rgba(153, 27, 27, 0.22) 100%) !important;
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
         padding: 10px 8px !important;
@@ -1298,35 +1298,35 @@ html.is-pwa-standalone #btn-header-install {
         white-space: nowrap;
         user-select: none;
         z-index: 10;
-        animation: hudPulse 3.5s ease-in-out infinite alternate;
+        animation: festivePulse 3.5s ease-in-out infinite alternate;
         box-sizing: border-box;
     }
 
-    /* 左聯：靠近 5x5 棋盤側鑲嵌青翠晴空微光導軌，外緣圓潤 */
+    /* 左聯：靠近 5x5 棋盤側鑲嵌朱砂暖紅微導軌，帶有福氣金芒微光 */
     .couplet-left {
         right: calc(100% + 22px);
         border: none !important;
-        border-right: 1.5px solid rgba(56, 189, 248, 0.65) !important;
-        border-radius: 6px 0 0 6px;
-        box-shadow: 2px 0 10px rgba(56, 189, 248, 0.3), inset -1px 0 4px rgba(74, 222, 128, 0.15) !important;
+        border-right: 1.8px solid rgba(239, 68, 68, 0.85) !important;
+        border-radius: 8px 0 0 8px;
+        box-shadow: 2px 0 12px rgba(239, 68, 68, 0.4), inset -1px 0 6px rgba(245, 158, 11, 0.25) !important;
     }
 
-    /* 右聯：靠近 5x5 棋盤側鑲嵌青翠晴空微光導軌，外緣圓潤 */
+    /* 右聯：靠近 5x5 棋盤側鑲嵌朱砂暖紅微導軌，帶有福氣金芒微光 */
     .couplet-right {
         left: calc(100% + 22px);
         border: none !important;
-        border-left: 1.5px solid rgba(56, 189, 248, 0.65) !important;
-        border-radius: 0 6px 6px 0;
-        box-shadow: -2px 0 10px rgba(56, 189, 248, 0.3), inset 1px 0 4px rgba(74, 222, 128, 0.15) !important;
+        border-left: 1.8px solid rgba(239, 68, 68, 0.85) !important;
+        border-radius: 0 8px 8px 0;
+        box-shadow: -2px 0 12px rgba(239, 68, 68, 0.4), inset 1px 0 6px rgba(245, 158, 11, 0.25) !important;
     }
 
-    /* HUD 頂端與底端科技幾何節點 (晴空霓虹發光菱形) */
+    /* 頂端與底端赤金幾何端點 (璀璨金黃發光菱形 ◆) */
     .hud-node {
-        font-size: 10px;
-        color: #38bdf8;
+        font-size: 11px;
+        color: #ffd700;
         line-height: 1;
-        text-shadow: 0 0 8px #38bdf8, 0 0 16px rgba(56, 189, 248, 0.8);
-        opacity: 0.9;
+        text-shadow: 0 0 8px #ffd700, 0 0 16px rgba(245, 158, 11, 0.9);
+        opacity: 0.95;
     }
 
     .hud-node-top {
@@ -1337,14 +1337,14 @@ html.is-pwa-standalone #btn-header-install {
         margin-top: 6px;
     }
 
-    /* HUD 全息立體書法金光字 (大字清晰、字間距舒展對稱) */
+    /* 璀璨帝王金春聯字 (大字清晰、金光流燦、朝氣祥和) */
     .hud-text {
-        color: #fef08a; /* 典雅帝王金 */
+        color: #ffd700; /* 璀璨真金 */
         font-size: 22px;
         font-weight: 900;
         letter-spacing: 11px; /* 10 個中文字自然流暢拉開 */
         line-height: 1;
-        text-shadow: 0 0 10px rgba(254, 240, 138, 0.6), 0 0 22px rgba(56, 189, 248, 0.35), 0 2px 4px rgba(0, 0, 0, 0.95);
+        text-shadow: 0 0 12px rgba(255, 215, 0, 0.75), 0 0 22px rgba(239, 68, 68, 0.45), 0 2px 4px rgba(0, 0, 0, 0.95);
     }
 
     /* 電腦版隱藏底部橫向宣導行，釋放垂直高度，徹底根除頂部與底部遮蔽 */
@@ -1353,14 +1353,14 @@ html.is-pwa-standalone #btn-header-install {
     }
 }
 
-/* 賽博全息微呼吸動效 (沉穩舒緩微光) */
-@keyframes hudPulse {
+/* 春意盎然赤金呼吸動效 (溫潤喜氣微光) */
+@keyframes festivePulse {
     0% {
-        filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.3));
-        opacity: 0.92;
+        filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.3));
+        opacity: 0.93;
     }
     100% {
-        filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.65));
+        filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.65));
         opacity: 1;
     }
 }
