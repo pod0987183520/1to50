@@ -352,12 +352,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=7.04"></script>
+    <script src="game.js?v=7.05"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.04')
+                navigator.serviceWorker.register('sw.js?v=7.05')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.error('ServiceWorker 註冊失敗: ', err));
             });
