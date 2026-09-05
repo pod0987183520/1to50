@@ -18,7 +18,7 @@
     <link rel="icon" href="z_img_app_192.png?v=7.04" type="image/png">
     <link rel="apple-touch-icon" href="z_img_app_192.png?v=7.04">
     <link rel="manifest" href="manifest.json?v=7.04">
-    <link rel="stylesheet" href="style.css?v=7.05">
+    <link rel="stylesheet" href="style.css?v=7.06">
     <script>
         // LINE 內嵌瀏覽器極速逃脫機制與 PWA 判斷
         (function() {
@@ -142,22 +142,15 @@
             <div class="divider-line"></div>
         </div>
 
-        <!-- 5x5 遊戲舞台區 (含電腦版左右直排對聯) -->
-        <div class="game-stage">
-            <!-- 左聯 (電腦版直排對聯) -->
-            <aside class="couplet couplet-left" aria-label="左聯：延緩失智提升手眼協調">
-                <span class="couplet-text">延緩失智提升手眼協調</span>
-            </aside>
+        <!-- 5x5 核心遊戲網格 (含電腦版左右無痕直排對聯) -->
+        <div class="game-container">
+            <!-- 左聯 (電腦版無痕直排對聯) -->
+            <div class="couplet couplet-left" aria-hidden="true">延緩失智提升手眼協調</div>
 
-            <!-- 5x5 核心遊戲網格 -->
-            <div class="game-container">
-                <div id="gameGrid" class="grid"></div>
-            </div>
+            <div id="gameGrid" class="grid"></div>
 
-            <!-- 右聯 (電腦版直排對聯) -->
-            <aside class="couplet couplet-right" aria-label="右聯：專注訓練也可加法乘法">
-                <span class="couplet-text">專注訓練也可加法乘法</span>
-            </aside>
+            <!-- 右聯 (電腦版無痕直排對聯) -->
+            <div class="couplet couplet-right" aria-hidden="true">專注訓練也可加法乘法</div>
         </div>
 
         <!-- 5x5 下方雙分隔線 -->
@@ -352,12 +345,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=7.05"></script>
+    <script src="game.js?v=7.06"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.05')
+                navigator.serviceWorker.register('sw.js?v=7.06')
                     .then(registration => console.log('1~50 遊戲 ServiceWorker 註冊成功！'))
                     .catch(err => console.error('ServiceWorker 註冊失敗: ', err));
             });
